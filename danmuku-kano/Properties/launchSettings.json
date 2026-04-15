@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "danmuku-kano (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "danmuku-kano (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

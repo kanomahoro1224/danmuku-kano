@@ -1,0 +1,1 @@
+using System; using System.Linq; using Windows.UI.Notifications; class P { static void Main() { var n = new NotificationBinding(); Console.WriteLine(n.GetTextElements().Count); Console.WriteLine(n.GetView().Count); } }

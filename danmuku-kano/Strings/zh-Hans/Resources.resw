@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppTitle" xml:space="preserve"><value>Kano 弹幕通知</value></data>
+  <data name="NavStyle" xml:space="preserve"><value>弹幕样式</value></data>
+  <data name="NavHistory" xml:space="preserve"><value>历史通知</value></data>
+  <data name="TextProjectBasedOn" xml:space="preserve"><value>此项目基于 Windows App SDK (WinUI 3)。</value></data>
+  <data name="TextNoNativeTransparency" xml:space="preserve"><value>由于 WinUI 3 目前没有原生的透明无边界窗口支持，</value></data>
+  <data name="TextComplexHooks" xml:space="preserve"><value>弹幕渲染改为由独立的 WPF 透明宿主层负责，主界面关闭后仍可继续工作。</value></data>
+  <data name="TextFontSize" xml:space="preserve"><value>字体大小(%)</value></data>
+  <data name="TextSpeed" xml:space="preserve"><value>弹幕速度</value></data>
+  <data name="TextOpacity" xml:space="preserve"><value>不透明度(%)</value></data>
+  <data name="TextDisplayArea" xml:space="preserve"><value>显示区域(%)</value></data>
+  <data name="TextDensity" xml:space="preserve"><value>弹幕密度</value></data>
+  <data name="TextDensityNormal" xml:space="preserve"><value>正常</value></data>
+  <data name="TextDensityMore" xml:space="preserve"><value>较多</value></data>
+  <data name="TextDensityOverlap" xml:space="preserve"><value>重叠</value></data>
+  <data name="TextFontAndColor" xml:space="preserve"><value>颜色与字体</value></data>
+  <data name="TextDefaultFont" xml:space="preserve"><value>默认字体</value></data>
+  <data name="TextDanmakuColorConfig" xml:space="preserve"><value>弹幕颜色设定</value></data>
+  <data name="TextBold" xml:space="preserve"><value>使用粗体</value></data>
+  <data name="TextShadow" xml:space="preserve"><value>发光/阴影效果</value></data>
+  <data name="TextTestDanmaku" xml:space="preserve"><value>发送测试通知弹幕 (调试)</value></data>
+  <data name="TextSystemSettings" xml:space="preserve"><value>系统设置</value></data>
+  <data name="TextLanguage" xml:space="preserve"><value>界面语言</value></data>
+  <data name="TextLanguageHans" xml:space="preserve"><value>简体中文</value></data>
+  <data name="TextLanguageHant" xml:space="preserve"><value>繁体中文</value></data>
+  <data name="TextLanguageEn" xml:space="preserve"><value>English</value></data>
+  <data name="TextLanguageJa" xml:space="preserve"><value>日本語</value></data>
+  <data name="TextCloseAction" xml:space="preserve"><value>关闭主界面时：</value></data>
+  <data name="TextMinimizeToTray" xml:space="preserve"><value>关闭到系统托盘</value></data>
+  <data name="TextExitApp" xml:space="preserve"><value>退出程序</value></data>
+  <data name="TextClosePrompt" xml:space="preserve"><value>关闭时提示</value></data>
+  <data name="TextAutoStart" xml:space="preserve"><value>开机时自动启动</value></data>
+  <data name="TrayAppShow" xml:space="preserve"><value>显示主界面</value></data>
+  <data name="TrayAppExit" xml:space="preserve"><value>完全退出</value></data>
+  <data name="DialogTitle" xml:space="preserve"><value>提示</value></data>
+  <data name="DialogConfirmMin" xml:space="preserve"><value>确定要关闭到系统托盘吗？</value></data>
+  <data name="DialogConfirmExit" xml:space="preserve"><value>确定要退出程序吗？</value></data>
+  <data name="DialogConfirm" xml:space="preserve"><value>确定</value></data>
+  <data name="DialogCancel" xml:space="preserve"><value>取消</value></data>
+  <data name="NotificationFallbackAppName" xml:space="preserve"><value>系统通知</value></data>
+  <data name="TestNotificationAppName" xml:space="preserve"><value>Kano 弹幕通知</value></data>
+  <data name="TestNotificationTitle" xml:space="preserve"><value>测试通知</value></data>
+  <data name="TestNotificationMessagePrefix" xml:space="preserve"><value>测试弹幕</value></data>
+</root>

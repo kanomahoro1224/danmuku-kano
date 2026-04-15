@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppTitle" xml:space="preserve"><value>Kano 彈幕通知</value></data>
+  <data name="NavStyle" xml:space="preserve"><value>彈幕樣式</value></data>
+  <data name="NavHistory" xml:space="preserve"><value>歷史通知</value></data>
+  <data name="TextProjectBasedOn" xml:space="preserve"><value>此專案基於 Windows App SDK (WinUI 3)。</value></data>
+  <data name="TextNoNativeTransparency" xml:space="preserve"><value>由於 WinUI 3 目前沒有原生的透明無邊界視窗支援，</value></data>
+  <data name="TextComplexHooks" xml:space="preserve"><value>彈幕渲染改由獨立的 WPF 透明宿主層負責，主介面關閉後仍可繼續運作。</value></data>
+  <data name="TextFontSize" xml:space="preserve"><value>字體大小(%)</value></data>
+  <data name="TextSpeed" xml:space="preserve"><value>彈幕速度</value></data>
+  <data name="TextOpacity" xml:space="preserve"><value>不透明度(%)</value></data>
+  <data name="TextDisplayArea" xml:space="preserve"><value>顯示區域(%)</value></data>
+  <data name="TextDensity" xml:space="preserve"><value>彈幕密度</value></data>
+  <data name="TextDensityNormal" xml:space="preserve"><value>正常</value></data>
+  <data name="TextDensityMore" xml:space="preserve"><value>較多</value></data>
+  <data name="TextDensityOverlap" xml:space="preserve"><value>重疊</value></data>
+  <data name="TextFontAndColor" xml:space="preserve"><value>顏色與字體</value></data>
+  <data name="TextDefaultFont" xml:space="preserve"><value>預設字體</value></data>
+  <data name="TextDanmakuColorConfig" xml:space="preserve"><value>彈幕顏色設定</value></data>
+  <data name="TextBold" xml:space="preserve"><value>使用粗體</value></data>
+  <data name="TextShadow" xml:space="preserve"><value>發光/陰影效果</value></data>
+  <data name="TextTestDanmaku" xml:space="preserve"><value>發送測試通知彈幕 (除錯)</value></data>
+  <data name="TextSystemSettings" xml:space="preserve"><value>系統設定</value></data>
+  <data name="TextLanguage" xml:space="preserve"><value>介面語言</value></data>
+  <data name="TextLanguageHans" xml:space="preserve"><value>簡體中文</value></data>
+  <data name="TextLanguageHant" xml:space="preserve"><value>繁體中文</value></data>
+  <data name="TextLanguageEn" xml:space="preserve"><value>English</value></data>
+  <data name="TextLanguageJa" xml:space="preserve"><value>日本語</value></data>
+  <data name="TextCloseAction" xml:space="preserve"><value>關閉主介面時：</value></data>
+  <data name="TextMinimizeToTray" xml:space="preserve"><value>關閉到系統匣</value></data>
+  <data name="TextExitApp" xml:space="preserve"><value>退出程式</value></data>
+  <data name="TextClosePrompt" xml:space="preserve"><value>關閉時提示</value></data>
+  <data name="TextAutoStart" xml:space="preserve"><value>開機時自動啟動</value></data>
+  <data name="TrayAppShow" xml:space="preserve"><value>顯示主介面</value></data>
+  <data name="TrayAppExit" xml:space="preserve"><value>完全退出</value></data>
+  <data name="DialogTitle" xml:space="preserve"><value>提示</value></data>
+  <data name="DialogConfirmMin" xml:space="preserve"><value>確定要關閉到系統匣嗎？</value></data>
+  <data name="DialogConfirmExit" xml:space="preserve"><value>確定要退出程式嗎？</value></data>
+  <data name="DialogConfirm" xml:space="preserve"><value>確定</value></data>
+  <data name="DialogCancel" xml:space="preserve"><value>取消</value></data>
+  <data name="NotificationFallbackAppName" xml:space="preserve"><value>系統通知</value></data>
+  <data name="TestNotificationAppName" xml:space="preserve"><value>Kano 彈幕通知</value></data>
+  <data name="TestNotificationTitle" xml:space="preserve"><value>測試通知</value></data>
+  <data name="TestNotificationMessagePrefix" xml:space="preserve"><value>測試彈幕</value></data>
+</root>

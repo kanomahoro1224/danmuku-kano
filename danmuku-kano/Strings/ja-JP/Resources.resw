@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppTitle" xml:space="preserve"><value>Kano 弾幕通知</value></data>
+  <data name="NavStyle" xml:space="preserve"><value>弾幕スタイル</value></data>
+  <data name="NavHistory" xml:space="preserve"><value>履歴</value></data>
+  <data name="TextProjectBasedOn" xml:space="preserve"><value>このプロジェクトは Windows App SDK (WinUI 3) をベースにしています。</value></data>
+  <data name="TextNoNativeTransparency" xml:space="preserve"><value>WinUI 3 には現在、ネイティブの透明な境界線なしウィンドウのサポートがなく、</value></data>
+  <data name="TextComplexHooks" xml:space="preserve"><value>弾幕描画は独立した WPF の透明ホストで処理し、メイン UI を閉じても動作を継続します。</value></data>
+  <data name="TextFontSize" xml:space="preserve"><value>フォントサイズ(%)</value></data>
+  <data name="TextSpeed" xml:space="preserve"><value>弾幕の速度</value></data>
+  <data name="TextOpacity" xml:space="preserve"><value>不透明度(%)</value></data>
+  <data name="TextDisplayArea" xml:space="preserve"><value>表示エリア(%)</value></data>
+  <data name="TextDensity" xml:space="preserve"><value>密度</value></data>
+  <data name="TextDensityNormal" xml:space="preserve"><value>標準</value></data>
+  <data name="TextDensityMore" xml:space="preserve"><value>多い</value></data>
+  <data name="TextDensityOverlap" xml:space="preserve"><value>重なり許可</value></data>
+  <data name="TextFontAndColor" xml:space="preserve"><value>色とフォント</value></data>
+  <data name="TextDefaultFont" xml:space="preserve"><value>デフォルト</value></data>
+  <data name="TextDanmakuColorConfig" xml:space="preserve"><value>色設定</value></data>
+  <data name="TextBold" xml:space="preserve"><value>太字</value></data>
+  <data name="TextShadow" xml:space="preserve"><value>発光 / 影効果</value></data>
+  <data name="TextTestDanmaku" xml:space="preserve"><value>テスト弾幕を送信</value></data>
+  <data name="TextSystemSettings" xml:space="preserve"><value>システム設定</value></data>
+  <data name="TextLanguage" xml:space="preserve"><value>言語</value></data>
+  <data name="TextLanguageHans" xml:space="preserve"><value>簡体字中国語</value></data>
+  <data name="TextLanguageHant" xml:space="preserve"><value>繁体字中国語</value></data>
+  <data name="TextLanguageEn" xml:space="preserve"><value>English</value></data>
+  <data name="TextLanguageJa" xml:space="preserve"><value>日本語</value></data>
+  <data name="TextCloseAction" xml:space="preserve"><value>メイン画面を閉じる時：</value></data>
+  <data name="TextMinimizeToTray" xml:space="preserve"><value>トレイに閉じる</value></data>
+  <data name="TextExitApp" xml:space="preserve"><value>終了</value></data>
+  <data name="TextClosePrompt" xml:space="preserve"><value>閉じる時に確認</value></data>
+  <data name="TextAutoStart" xml:space="preserve"><value>自動起動</value></data>
+  <data name="TrayAppShow" xml:space="preserve"><value>メイン画面を表示</value></data>
+  <data name="TrayAppExit" xml:space="preserve"><value>完全に終了</value></data>
+  <data name="DialogTitle" xml:space="preserve"><value>確認</value></data>
+  <data name="DialogConfirmMin" xml:space="preserve"><value>ウィンドウをシステムトレイに閉じますか？</value></data>
+  <data name="DialogConfirmExit" xml:space="preserve"><value>アプリケーションを終了しますか？</value></data>
+  <data name="DialogConfirm" xml:space="preserve"><value>OK</value></data>
+  <data name="DialogCancel" xml:space="preserve"><value>キャンセル</value></data>
+  <data name="NotificationFallbackAppName" xml:space="preserve"><value>システム通知</value></data>
+  <data name="TestNotificationAppName" xml:space="preserve"><value>Kano 弾幕通知</value></data>
+  <data name="TestNotificationTitle" xml:space="preserve"><value>テスト通知</value></data>
+  <data name="TestNotificationMessagePrefix" xml:space="preserve"><value>テスト弾幕</value></data>
+</root>

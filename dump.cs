@@ -1,0 +1,1 @@
+using System; using System.Reflection; class P { static void Main() { var t = typeof(Windows.UI.Notifications.NotificationBinding); foreach(var m in t.GetMethods()) Console.WriteLine(m.Name); foreach(var p in t.GetProperties()) Console.WriteLine(p.Name); } }
