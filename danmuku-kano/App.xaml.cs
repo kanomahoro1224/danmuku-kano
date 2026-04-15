@@ -1,152 +1,71 @@
-using System;
-using System.Threading.Tasks;
-using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using damuku_kano.Models;
-using damuku_kano.Services;
+using Microsoft.UI.Xaml.Controls.Primitives;
+using Microsoft.UI.Xaml.Data;
+using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Navigation;
+using Microsoft.UI.Xaml.Shapes;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.ApplicationModel;
+using Windows.ApplicationModel.Activation;
+using Windows.Foundation;
+using Windows.Foundation.Collections;
 
-namespace damuku_kano;
+// To learn more about WinUI, the WinUI project structure,
+// and more about our project templates, see: http://aka.ms/winui-project-info.
 
-public partial class App : Application
+namespace damuku_kano
 {
-    private MainWindow? _mainWindow;
-    private Window? _dummyWindow;
-    private bool _isExiting;
-
-    public NotificationService NotificationService { get; }
-    public TrayIconService TrayIconService { get; }
-    public DanmakuOverlayService OverlayService { get; }
-    public LocalizationService Strings => LocalizationService.Instance;
-
-    public App()
+    /// <summary>
+    /// Provides application-specific behavior to supplement the default Application class.
+    /// </summary>
+    public partial class App : Application
     {
-        Strings.ApplySavedLanguage();
-        InitializeComponent();
+        private Window? _window;
 
-        TrayIconService = new TrayIconService();
-        OverlayService = new DanmakuOverlayService();
-        NotificationService = new NotificationService();
-
-        TrayIconService.ShowRequested += (_, _) => ShowMainWindow();
-        TrayIconService.ExitRequested += (_, _) => ExitApplication();
-        NotificationService.OnNewDanmaku += HandleNewDanmaku;
-    }
-
-    protected override async void OnLaunched(LaunchActivatedEventArgs args)
-    {
-        _dummyWindow = new Window(); // Keep process alive
-        var presenter = (OverlappedPresenter)_dummyWindow.AppWindow.Presenter;
-        presenter.IsAlwaysOnTop = false;
-        presenter.SetBorderAndTitleBar(false, false);
-        _dummyWindow.AppWindow.IsShownInSwitchers = false;
-
-        TrayIconService.UpdateStrings();
-        ShowMainWindow();
-        await NotificationService.InitializeAsync();
-    }
-
-    public void ShowMainWindow()
-    {
-        if (_isExiting)
+        /// <summary>
+        /// Initializes the singleton application object.  This is the first line of authored code
+        /// executed, and as such is the logical equivalent of main() or WinMain().
+        /// </summary>
+        public App()
         {
-            return;
-        }
-
-        if (_mainWindow == null)
-        {
-            _mainWindow = new MainWindow(this);
-            _mainWindow.Closed += MainWindow_Closed;
-            AppIconHelper.ApplyWindowIcon(_mainWindow);
-        }
-
-        _mainWindow.Activate();
-    }
-
-    public async Task HandleMainWindowClosingAsync(MainWindow window, AppWindowClosingEventArgs args)
-    {
-        if (_isExiting)
-        {
-            return;
-        }
-
-        int closeAction = SettingsService.Get<int>("CloseAction", 0);
-        bool showPrompt = SettingsService.Get<bool>("ClosePrompt", false);
-
-        if (showPrompt)
-        {
-            args.Cancel = true;
-
-            var dialog = new ContentDialog
+            try
             {
-                Title = Strings.DialogTitle,
-                Content = closeAction == 0 ? Strings.DialogConfirmMin : Strings.DialogConfirmExit,
-                PrimaryButtonText = Strings.DialogConfirm,
-                CloseButtonText = Strings.DialogCancel,
-                XamlRoot = window.Content.XamlRoot
-            };
-
-            var result = await dialog.ShowAsync();
-            if (result != ContentDialogResult.Primary)
-            {
-                return;
+                int lang = Services.SettingsService.Get<int>("Language", 0);
+                if (lang == 0) Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = "zh-Hans";
+                else if (lang == 1) Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = "zh-Hant";
+                else if (lang == 2) Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = "en-US";
+                else if (lang == 3) Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = "ja-JP";
             }
+            catch { }
+
+            InitializeComponent();
         }
 
-        if (closeAction == 0)
+        /// <summary>
+        /// Invoked when the application is launched.
+        /// </summary>
+        /// <param name="args">Details about the launch request and process.</param>
+        protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
-            args.Cancel = false;
-            return;
-        }
-
-        args.Cancel = true;
-        ExitApplication();
-    }
-
-    public void ApplyLanguage(int languageIndex)
-    {
-        Strings.ApplyLanguage(languageIndex);
-        TrayIconService.UpdateStrings();
-    }
-
-    public void ShowTestDanmaku()
-    {
-        HandleNewDanmaku(new NotificationItem
-        {
-            AppName = Strings.TestNotificationAppName,
-            Title = Strings.TestNotificationTitle,
-            Message = $"{Strings.TestNotificationMessagePrefix} - {DateTime.Now:HH:mm:ss}",
-            Time = DateTime.Now.ToString("HH:mm")
-        });
-    }
-
-    public void ExitApplication()
-    {
-        if (_isExiting)
-        {
-            return;
-        }
-
-        _isExiting = true;
-
-        TrayIconService.Dispose();
-        NotificationService.Dispose();
-        OverlayService.Dispose();
-
-        Exit();
-    }
-
-    private void HandleNewDanmaku(NotificationItem item)
-    {
-        _ = OverlayService.ShowNotificationAsync(item, DanmakuStyleSettings.Load());
-    }
-
-    private void MainWindow_Closed(object sender, WindowEventArgs args)
-    {
-        if (ReferenceEquals(sender, _mainWindow))
-        {
-            _mainWindow.Closed -= MainWindow_Closed;
-            _mainWindow = null;
+            _window = new MainWindow();
+            
+            var cmdArgs = Environment.GetCommandLineArgs();
+            if (cmdArgs.Contains("--autostart"))
+            {
+                // Just activate in background if that's supported, else don't bring to front
+                // But for WinUI 3 the easiest way without complex native calls is just to launch and then minimize:
+            }
+            
+            if (!cmdArgs.Contains("--autostart"))
+            {
+                _window.Activate();
+            }
         }
     }
 }
