@@ -30,7 +30,14 @@
   <data name="TextDefaultFont" xml:space="preserve"><value>Default Font</value></data>
   <data name="TextDanmakuColorConfig" xml:space="preserve"><value>Color Settings</value></data>
   <data name="TextBold" xml:space="preserve"><value>Bold</value></data>
+  <data name="TextBorder" xml:space="preserve"><value>Text Outline</value></data>
+  <data name="TextBorderColorConfig" xml:space="preserve"><value>Outline Color</value></data>
+  <data name="TextBorderThickness" xml:space="preserve"><value>Outline Thickness</value></data>
   <data name="TextShadow" xml:space="preserve"><value>Glow / Shadow Effect</value></data>
+  <data name="TextShadowColorConfig" xml:space="preserve"><value>Shadow Color</value></data>
+  <data name="TextShadowBlur" xml:space="preserve"><value>Shadow Blur</value></data>
+  <data name="TextShadowDepth" xml:space="preserve"><value>Shadow Offset</value></data>
+  <data name="TextShadowOpacity" xml:space="preserve"><value>Shadow Opacity (%)</value></data>
   <data name="TextTestDanmaku" xml:space="preserve"><value>Send Test Danmaku (Debug)</value></data>
   <data name="TextSystemSettings" xml:space="preserve"><value>System Settings</value></data>
   <data name="TextLanguage" xml:space="preserve"><value>Interface Language</value></data>
@@ -54,4 +61,15 @@
   <data name="TestNotificationAppName" xml:space="preserve"><value>Kano Danmaku Notification</value></data>
   <data name="TestNotificationTitle" xml:space="preserve"><value>Test Notification</value></data>
   <data name="TestNotificationMessagePrefix" xml:space="preserve"><value>Test Danmaku</value></data>
+  <data name="StartupDisabledByUserMessage" xml:space="preserve"><value>Windows has disabled startup for this app by user choice. Enable Kano manually in Windows Settings &gt; Apps &gt; Startup, or Task Manager &gt; Startup apps.</value></data>
+  <data name="StartupDisabledByPolicyMessage" xml:space="preserve"><value>Windows policy currently blocks this app from starting with Windows. Check your administrator or Group Policy settings.</value></data>
+  <data name="StartupEnabledByPolicyMessage" xml:space="preserve"><value>Windows policy currently forces this app to start with Windows, so it cannot be turned off in the app.</value></data>
+  <data name="StartupTaskUnavailableMessage" xml:space="preserve"><value>Cannot read or change the Windows startup task. Make sure the app is running as an MSIX packaged build.</value></data>
+  <data name="NavAbout" xml:space="preserve"><value>About</value></data>
+  <data name="AboutProductName" xml:space="preserve"><value>Kano Danmaku Notification</value></data>
+  <data name="AboutVersionTemplate" xml:space="preserve"><value>{0}-release ({1})</value></data>
+  <data name="AboutArchitecture64" xml:space="preserve"><value>64-bit</value></data>
+  <data name="AboutArchitecture32" xml:space="preserve"><value>32-bit</value></data>
+  <data name="AboutMadeByPrefix" xml:space="preserve"><value>Made with</value></data>
+  <data name="AboutMadeBySuffix" xml:space="preserve"><value>by 鹿可可</value></data>
 </root>

@@ -1,5 +1,8 @@
 using System;
+using System.Globalization;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
@@ -9,190 +12,22 @@ using System.Runtime.InteropServices;
 using WinRT.Interop;
 using System.Windows.Interop;
 using System.Windows.Media;
+using Windows.ApplicationModel;
 
 namespace damuku_kano;
 
-public class MuiHelper : System.ComponentModel.INotifyPropertyChanged
-{
-    public static MuiHelper Instance { get; } = new MuiHelper();
-
-    public event System.ComponentModel.PropertyChangedEventHandler? PropertyChanged;
-    public void Refresh() => PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(null));
-
-    public string AppTitle => "Kano " + Lang("弹幕通知");
-    public string NavStyle => Lang("弹幕样式");
-    public string NavHistory => Lang("历史通知");
-    public string TextProjectBasedOn => Lang("此项目基于 Windows App SDK (WinUI 3)。");
-    public string TextNoNativeTransparency => Lang("由于 WinUI 3 目前没有原生的透明无边界窗口支持（类似WPF的AllowsTransparency=True），");
-    public string TextComplexHooks => Lang("实现全屏透明的弹幕叠加层需要复杂的 Win32 P/Invoke Hooks。");
-    public string TextFontSize => Lang("字体大小(%)");
-    public string TextSpeed => Lang("弹幕速度");
-    public string TextOpacity => Lang("不透明度(%)");
-    public string TextDisplayArea => Lang("显示区域(%)");
-    public string TextDensity => Lang("弹幕密度");
-    public string TextDensityNormal => Lang("正常");
-    public string TextDensityMore => Lang("较多");
-    public string TextDensityOverlap => Lang("重叠");
-    public string TextFontAndColor => Lang("颜色与字体");
-    public string TextDefaultFont => Lang("默认字体");
-    public string TextDanmakuColorConfig => Lang("弹幕颜色设定");
-    public string TextBold => Lang("使用粗体");
-    public string TextShadow => Lang("发光/阴影效果");
-    public string TextTestDanmaku => Lang("发送测试通知弹幕 (调试)");
-    
-    public string TextSystemSettings => Lang("系统设置");
-    public string TextLanguage => Lang("界面语言");
-    public string TextCloseAction => Lang("关闭主界面时：");
-    public string TextMinimizeToTray => Lang("最小化到系统托盘");
-    public string TextExitApp => Lang("退出程序");
-    public string TextClosePrompt => Lang("关闭时提示");
-    public string TextAutoStart => Lang("开机时自动启动");
-
-    public string TrayAppShow => Lang("显示主界面");
-    public string TrayAppExit => Lang("完全退出");
-
-    public string DialogTitle => Lang("提示");
-    public string DialogConfirmMin => Lang("确定要最小化到系统托盘吗？");
-    public string DialogConfirmExit => Lang("确定要退出程序吗？");
-    public string DialogConfirm => Lang("确定");
-    public string DialogCancel => Lang("取消");
-
-    private string Lang(string chs)
-    {
-        int langIndex = Services.SettingsService.Get<int>("Language", 0);
-        string lang = "zh-Hans";
-        if (langIndex == 1) lang = "zh-Hant";
-        else if (langIndex == 2) lang = "en-US";
-        else if (langIndex == 3) lang = "ja-JP";
-
-        if (lang.StartsWith("en", StringComparison.OrdinalIgnoreCase))
-        {
-            return chs switch {
-                "弹幕通知" => "Danmaku Notification",
-                "弹幕样式" => "Danmaku Style",
-                "历史通知" => "History",
-                "此项目基于 Windows App SDK (WinUI 3)。" => "Based on Windows App SDK (WinUI 3).",
-                "由于 WinUI 3 目前没有原生的透明无边界窗口支持（类似WPF的AllowsTransparency=True），" => "Due to no native transparent borderless window support in WinUI 3,",
-                "实现全屏透明的弹幕叠加层需要复杂的 Win32 P/Invoke Hooks。" => "requires complex Win32 P/Invoke Hooks to implement full-screen transparent danmaku layer.",
-                "字体大小(%)" => "Font Size (%)",
-                "弹幕速度" => "Danmaku Speed",
-                "不透明度(%)" => "Opacity (%)",
-                "显示区域(%)" => "Display Area (%)",
-                "弹幕密度" => "Density",
-                "正常" => "Normal",
-                "较多" => "More",
-                "重叠" => "Overlap",
-                "颜色与字体" => "Color and Font",
-                "默认字体" => "Default Font",
-                "弹幕颜色设定" => "Color Settings",
-                "使用粗体" => "Bold",
-                "发光/阴影效果" => "Glow/Shadow Effect",
-                "发送测试通知弹幕 (调试)" => "Send Test Danmaku (Debug)",
-                "系统设置" => "System Settings",
-                "界面语言" => "Interface Language",
-                "关闭主界面时：" => "When closing main window:",
-                "最小化到系统托盘" => "Minimize to tray",
-                "退出程序" => "Exit program",
-                "关闭时提示" => "Prompt on close",
-                "开机时自动启动" => "Start with Windows",
-                "显示主界面" => "Show Main Window",
-                "完全退出" => "Exit",
-                "提示" => "Prompt",
-                "确定要最小化到系统托盘吗？" => "Are you sure to minimize to system tray?",
-                "确定要退出程序吗？" => "Are you sure to exit the program?",
-                "确定" => "OK",
-                "取消" => "Cancel",
-                _ => chs
-            };
-        }
-        else if (lang.StartsWith("ja", StringComparison.OrdinalIgnoreCase))
-        {
-            return chs switch {
-                "弹幕通知" => "弾幕通知",
-                "弹幕样式" => "弾幕スタイル",
-                "历史通知" => "履歴",
-                "此项目基于 Windows App SDK (WinUI 3)。" => "このプロジェクトは Windows App SDK (WinUI 3) をベースにしています。",
-                "由于 WinUI 3 目前没有原生的透明无边界窗口支持（类似WPF的AllowsTransparency=True），" => "WinUI 3には現在、ネイティブの透明な境界線なしウィンドウのサポートがありません。",
-                "实现全屏透明的弹幕叠加层需要复杂的 Win32 P/Invoke Hooks。" => "フルスクリーンの透明レイヤーを実装するには複雑なWin32 P/Invoke Hookが必要です。",
-                "字体大小(%)" => "フォントサイズ(%)",
-                "弹幕速度" => "弾幕の速度",
-                "不透明度(%)" => "不透明度(%)",
-                "显示区域(%)" => "表示エリア(%)",
-                "弹幕密度" => "密度",
-                "正常" => "標準",
-                "较多" => "多い",
-                "重叠" => "重なり許可",
-                "颜色与字体" => "色とフォント",
-                "默认字体" => "デフォルト",
-                "弹幕颜色设定" => "弾幕の色設定",
-                "使用粗体" => "太字",
-                "发光/阴影效果" => "発光/影効果",
-                "发送测试通知弹幕 (调试)" => "テスト弾幕を送信",
-                "系统设置" => "システム設定",
-                "界面语言" => "言語",
-                "关闭主界面时：" => "メイン画面を閉じる時：",
-                "最小化到系统托盘" => "システムトレイに最小化",
-                "退出程序" => "終了",
-                "关闭时提示" => "閉じる時に確認",
-                "开机时自动启动" => "自動起動",
-                "显示主界面" => "メイン画面を表示",
-                "完全退出" => "完全に終了",
-                "提示" => "確認",
-                "确定要最小化到系统托盘吗？" => "システムトレイに最小化しますか？",
-                "确定要退出程序吗？" => "プログラムを終了しますか？",
-                "确定" => "OK",
-                "取消" => "キャンセル",
-                _ => chs
-            };
-        }
-        else if (lang.StartsWith("zh-Hant", StringComparison.OrdinalIgnoreCase) || lang.Equals("zh-TW", StringComparison.OrdinalIgnoreCase))
-        {
-            return chs switch {
-                "弹幕通知" => "彈幕通知",
-                "弹幕样式" => "彈幕樣式",
-                "历史通知" => "歷史通知",
-                "此项目基于 Windows App SDK (WinUI 3)。" => "此專案基於 Windows App SDK (WinUI 3)。",
-                "由于 WinUI 3 目前没有原生的透明无边界窗口支持（类似WPF的AllowsTransparency=True），" => "由於 WinUI 3 目前沒有原生的透明無邊界視窗支援，",
-                "实现全屏透明的弹幕叠加层需要复杂的 Win32 P/Invoke Hooks。" => "實現全螢幕透明的彈幕疊加層需要複雜的 Win32 P/Invoke Hooks。",
-                "字体大小(%)" => "字體大小(%)",
-                "弹幕速度" => "彈幕速度",
-                "不透明度(%)" => "不透明度(%)",
-                "显示区域(%)" => "顯示區域(%)",
-                "弹幕密度" => "彈幕密度",
-                "正常" => "正常",
-                "较多" => "較多",
-                "重叠" => "重疊",
-                "颜色与字体" => "顏色與字體",
-                "默认字体" => "預設字體",
-                "弹幕颜色设定" => "彈幕顏色設定",
-                "使用粗体" => "使用粗體",
-                "发光/阴影效果" => "發光/陰影效果",
-                "发送测试通知弹幕 (调试)" => "發送測試通知彈幕 (除錯)",
-                "系统设置" => "系統設置",
-                "界面语言" => "介面語言",
-                "关闭主界面时：" => "關閉主介面時：",
-                "最小化到系统托盘" => "最小化到系統匣",
-                "退出程序" => "退出程式",
-                "关闭时提示" => "關閉時提示",
-                "开机时自动启动" => "開機時自動啟動",
-                "显示主界面" => "顯示主介面",
-                "完全退出" => "完全退出",
-                "提示" => "提示",
-                "确定要最小化到系统托盘吗？" => "確定要最小化到系統匣嗎？",
-                "确定要退出程序吗？" => "確定要退出程式嗎？",
-                "确定" => "確定",
-                "取消" => "取消",
-                _ => chs
-            };
-        }
-        return chs;
-    }
-}
-
 public sealed partial class MainWindow : Window
 {
+    private const string StartupTaskId = "KanoDanmakuStartupId";
     private NotificationService _notificationService;
-    private System.Windows.Forms.NotifyIcon _notifyIcon;
+    private System.Windows.Forms.NotifyIcon _notifyIcon = null!;
+    private bool _isUpdatingAutoStartToggle;
+    private bool _isApplyingSettings;
+
+    public string AboutVersionText => string.Format(
+        LocalizationService.Instance.AboutVersionTemplate,
+        GetAppVersion(),
+        Environment.Is64BitProcess ? LocalizationService.Instance.AboutArchitecture64 : LocalizationService.Instance.AboutArchitecture32);
 
     public MainWindow()
     {
@@ -222,6 +57,7 @@ public sealed partial class MainWindow : Window
 
         LoadSettings();
         SetupSettingsAutoSave();
+        _ = SyncAutoStartToggleAsync();
 
         _notificationService = new NotificationService();
         _notificationService.OnNewDanmaku += _notificationService_OnNewDanmaku;
@@ -237,15 +73,32 @@ public sealed partial class MainWindow : Window
     {
         if (args.IsSettingsSelected)
         {
-            StylePane.Visibility = Visibility.Collapsed;
-            SystemSettingsPane.Visibility = Visibility.Visible;
-            HistoryPane.Visibility = Visibility.Collapsed;
+            ShowPane("Settings");
         }
         else if (args.SelectedItem is NavigationViewItem item)
         {
-            StylePane.Visibility = item.Tag?.ToString() == "Style" ? Visibility.Visible : Visibility.Collapsed;
-            SystemSettingsPane.Visibility = Visibility.Collapsed;
-            HistoryPane.Visibility = item.Tag?.ToString() == "History" ? Visibility.Visible : Visibility.Collapsed;
+            ShowPane(item.Tag?.ToString());
+        }
+    }
+
+    private void ShowPane(string? tag)
+    {
+        StylePane.Visibility = tag == "Style" ? Visibility.Visible : Visibility.Collapsed;
+        SystemSettingsPane.Visibility = tag == "Settings" ? Visibility.Visible : Visibility.Collapsed;
+        AboutPane.Visibility = tag == "About" ? Visibility.Visible : Visibility.Collapsed;
+        HistoryPane.Visibility = tag == "History" ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    private static string GetAppVersion()
+    {
+        try
+        {
+            var version = Package.Current.Id.Version;
+            return $"{version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
+        }
+        catch
+        {
+            return System.Reflection.Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.0.0.0";
         }
     }
 
@@ -272,7 +125,7 @@ public sealed partial class MainWindow : Window
             _notifyIcon.Icon = System.Drawing.SystemIcons.Application;
         }
         
-        _notifyIcon.Text = MuiHelper.Instance.AppTitle;
+        _notifyIcon.Text = LocalizationService.Instance.AppTitle;
         _notifyIcon.Visible = true;
         _notifyIcon.DoubleClick += (s, e) =>
         {
@@ -280,9 +133,9 @@ public sealed partial class MainWindow : Window
         };
 
         var contextMenu = new System.Windows.Forms.ContextMenuStrip();
-        var showItem = new System.Windows.Forms.ToolStripMenuItem(MuiHelper.Instance.TrayAppShow);
+        var showItem = new System.Windows.Forms.ToolStripMenuItem(LocalizationService.Instance.TrayAppShow);
         showItem.Click += (s, e) => this.AppWindow.Show();
-        var exitItem = new System.Windows.Forms.ToolStripMenuItem(MuiHelper.Instance.TrayAppExit);
+        var exitItem = new System.Windows.Forms.ToolStripMenuItem(LocalizationService.Instance.TrayAppExit);
         exitItem.Click += (s, e) =>
         {
             _notifyIcon.Visible = false;
@@ -305,10 +158,10 @@ public sealed partial class MainWindow : Window
             
             var dialog = new ContentDialog
             {
-                Title = MuiHelper.Instance.DialogTitle,
-                Content = CloseActionMinimize.IsChecked == true ? MuiHelper.Instance.DialogConfirmMin : MuiHelper.Instance.DialogConfirmExit,
-                PrimaryButtonText = MuiHelper.Instance.DialogConfirm,
-                CloseButtonText = MuiHelper.Instance.DialogCancel,
+                Title = LocalizationService.Instance.DialogTitle,
+                Content = CloseActionMinimize.IsChecked == true ? LocalizationService.Instance.DialogConfirmMin : LocalizationService.Instance.DialogConfirmExit,
+                PrimaryButtonText = LocalizationService.Instance.DialogConfirm,
+                CloseButtonText = LocalizationService.Instance.DialogCancel,
                 XamlRoot = this.Content.XamlRoot
             };
             var result = await dialog.ShowAsync();
@@ -333,36 +186,44 @@ public sealed partial class MainWindow : Window
 
     private void SaveSettings()
     {
+        if (_isApplyingSettings)
+        {
+            return;
+        }
+
         Services.SettingsService.Set("FontSize", FontSizeSlider.Value);
         Services.SettingsService.Set("Speed", SpeedSlider.Value);
         Services.SettingsService.Set("Opacity", OpacitySlider.Value);
         Services.SettingsService.Set("DisplayArea", DisplayAreaSlider.Value);
         Services.SettingsService.Set("Density", DensityNormal.IsChecked == true ? 0 : (DensityMore.IsChecked == true ? 1 : 2));
-        Services.SettingsService.Set("FontFamily", FontFamilyCombo.SelectedIndex);
+        Services.SettingsService.Set("FontFamilyName", GetSelectedFontFamilyName());
         
         var color = DanmakuColor.Color;
-        Services.SettingsService.Set("DanmakuColor", $"{color.A},{color.R},{color.G},{color.B}");
+        Services.SettingsService.Set("DanmakuColor", SerializeColor(color));
+        Services.SettingsService.Set("BorderColor", SerializeColor(BorderColor.Color));
+        Services.SettingsService.Set("ShadowColor", SerializeColor(ShadowColor.Color));
         
         Services.SettingsService.Set("Bold", BoldToggle.IsOn);
+        Services.SettingsService.Set("Border", BorderToggle.IsOn);
+        Services.SettingsService.Set("BorderThickness", BorderThicknessSlider.Value);
         Services.SettingsService.Set("Shadow", ShadowToggle.IsOn);
+        Services.SettingsService.Set("ShadowBlur", ShadowBlurSlider.Value);
+        Services.SettingsService.Set("ShadowDepth", ShadowDepthSlider.Value);
+        Services.SettingsService.Set("ShadowOpacity", ShadowOpacitySlider.Value);
         
-        int langIndex = LanguageCombo.SelectedIndex;
+        int langIndex = LocalizationService.NormalizeLanguageIndex(LanguageCombo.SelectedIndex);
+        int savedLangIndex = Services.SettingsService.Get<int>("Language", 0);
         Services.SettingsService.Set("Language", langIndex);
-        try
+        if (langIndex != savedLangIndex)
         {
-            if (langIndex == 0) Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = "zh-Hans";
-            else if (langIndex == 1) Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = "zh-Hant";
-            else if (langIndex == 2) Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = "en-US";
-            else if (langIndex == 3) Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = "ja-JP";
+            string selectedFontName = GetSelectedFontFamilyName();
+            LocalizationService.Instance.ApplyLanguage(langIndex);
+            Bindings.Update();
+            PopulateFontFamilyCombo(selectedFontName);
         }
-        catch { }
-        
-        MuiHelper.Instance.Refresh(); // Refresh localized strings
         
         Services.SettingsService.Set("CloseAction", CloseActionMinimize.IsChecked == true ? 0 : 1);
         Services.SettingsService.Set("ClosePrompt", CloseActionPrompt.IsChecked == true);
-        
-        Services.SettingsService.Set("AutoStart", AutoStartToggle.IsOn);
         
         UpdateTrayMenuStrings();
     }
@@ -371,17 +232,123 @@ public sealed partial class MainWindow : Window
     {
         if (_notifyIcon != null)
         {
-            _notifyIcon.Text = MuiHelper.Instance.AppTitle;
+            _notifyIcon.Text = LocalizationService.Instance.AppTitle;
             if (_notifyIcon.ContextMenuStrip != null && _notifyIcon.ContextMenuStrip.Items.Count >= 2)
             {
-                _notifyIcon.ContextMenuStrip.Items[0].Text = MuiHelper.Instance.TrayAppShow;
-                _notifyIcon.ContextMenuStrip.Items[1].Text = MuiHelper.Instance.TrayAppExit;
+                _notifyIcon.ContextMenuStrip.Items[0].Text = LocalizationService.Instance.TrayAppShow;
+                _notifyIcon.ContextMenuStrip.Items[1].Text = LocalizationService.Instance.TrayAppExit;
             }
         }
     }
 
+    private void PopulateFontFamilyCombo(string? selectedFontName)
+    {
+        bool wasApplyingSettings = _isApplyingSettings;
+        _isApplyingSettings = true;
+
+        try
+        {
+            FontFamilyCombo.Items.Clear();
+            FontFamilyCombo.Items.Add(new ComboBoxItem
+            {
+                Content = LocalizationService.Instance.TextDefaultFont,
+                Tag = string.Empty
+            });
+
+            foreach (string fontName in System.Windows.Media.Fonts.SystemFontFamilies
+                         .Select(font => font.Source)
+                         .Where(name => !string.IsNullOrWhiteSpace(name))
+                         .Distinct(StringComparer.CurrentCultureIgnoreCase)
+                         .OrderBy(name => name, StringComparer.CurrentCultureIgnoreCase))
+            {
+                FontFamilyCombo.Items.Add(new ComboBoxItem
+                {
+                    Content = fontName,
+                    Tag = fontName
+                });
+            }
+
+            SelectFontFamily(selectedFontName);
+        }
+        finally
+        {
+            _isApplyingSettings = wasApplyingSettings;
+        }
+    }
+
+    private void SelectFontFamily(string? fontName)
+    {
+        string normalizedFontName = fontName ?? string.Empty;
+
+        for (int i = 0; i < FontFamilyCombo.Items.Count; i++)
+        {
+            if (FontFamilyCombo.Items[i] is ComboBoxItem item &&
+                string.Equals(item.Tag?.ToString() ?? string.Empty, normalizedFontName, StringComparison.CurrentCultureIgnoreCase))
+            {
+                FontFamilyCombo.SelectedIndex = i;
+                return;
+            }
+        }
+
+        FontFamilyCombo.SelectedIndex = 0;
+    }
+
+    private string GetSelectedFontFamilyName()
+    {
+        if (FontFamilyCombo.SelectedItem is ComboBoxItem item)
+        {
+            return item.Tag?.ToString() ?? string.Empty;
+        }
+
+        return string.Empty;
+    }
+
+    private static string GetLegacyFontFamilyName(int selectedIndex)
+    {
+        return selectedIndex switch
+        {
+            1 => "微软雅黑",
+            2 => "黑体",
+            3 => "楷体",
+            _ => string.Empty
+        };
+    }
+
+    private static string SerializeColor(Windows.UI.Color color)
+    {
+        return $"{color.A},{color.R},{color.G},{color.B}";
+    }
+
+    private static bool TryParseColor(string? value, out Windows.UI.Color color)
+    {
+        color = default;
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return false;
+        }
+
+        var parts = value.Split(',');
+        if (parts.Length != 4)
+        {
+            return false;
+        }
+
+        if (byte.TryParse(parts[0], out byte a) &&
+            byte.TryParse(parts[1], out byte r) &&
+            byte.TryParse(parts[2], out byte g) &&
+            byte.TryParse(parts[3], out byte b))
+        {
+            color = Windows.UI.Color.FromArgb(a, r, g, b);
+            return true;
+        }
+
+        return false;
+    }
+
     private void LoadSettings()
     {
+        _isApplyingSettings = true;
+
         try
         {
             FontSizeSlider.Value = Services.SettingsService.Get<double>("FontSize", 100);
@@ -394,21 +361,37 @@ public sealed partial class MainWindow : Window
             else if (den == 1) DensityMore.IsChecked = true;
             else DensityOverlap.IsChecked = true;
             
-            FontFamilyCombo.SelectedIndex = Services.SettingsService.Get<int>("FontFamily", 0);
-            
-            var cStr = Services.SettingsService.Get<string>("DanmakuColor");
-            if (!string.IsNullOrEmpty(cStr))
+            string? selectedFontName = Services.SettingsService.Get<string>("FontFamilyName");
+            if (string.IsNullOrWhiteSpace(selectedFontName))
             {
-                var parts = cStr.Split(',');
-                if (parts.Length == 4 && byte.TryParse(parts[0], out byte a) && byte.TryParse(parts[1], out byte r) && byte.TryParse(parts[2], out byte g) && byte.TryParse(parts[3], out byte b))
-                {
-                    DanmakuColor.Color = Windows.UI.Color.FromArgb(a, r, g, b);
-                }
+                selectedFontName = GetLegacyFontFamilyName(Services.SettingsService.Get<int>("FontFamily", 0));
+            }
+
+            PopulateFontFamilyCombo(selectedFontName);
+            
+            if (TryParseColor(Services.SettingsService.Get<string>("DanmakuColor"), out var danmakuColor))
+            {
+                DanmakuColor.Color = danmakuColor;
+            }
+
+            if (TryParseColor(Services.SettingsService.Get<string>("BorderColor"), out var borderColor))
+            {
+                BorderColor.Color = borderColor;
+            }
+
+            if (TryParseColor(Services.SettingsService.Get<string>("ShadowColor"), out var shadowColor))
+            {
+                ShadowColor.Color = shadowColor;
             }
             
             BoldToggle.IsOn = Services.SettingsService.Get<bool>("Bold", true);
+            BorderToggle.IsOn = Services.SettingsService.Get<bool>("Border", false);
+            BorderThicknessSlider.Value = Services.SettingsService.Get<double>("BorderThickness", 2);
             ShadowToggle.IsOn = Services.SettingsService.Get<bool>("Shadow", true);
-            LanguageCombo.SelectedIndex = Services.SettingsService.Get<int>("Language", 0);
+            ShadowBlurSlider.Value = Services.SettingsService.Get<double>("ShadowBlur", 4);
+            ShadowDepthSlider.Value = Services.SettingsService.Get<double>("ShadowDepth", 2);
+            ShadowOpacitySlider.Value = Services.SettingsService.Get<double>("ShadowOpacity", 100);
+            LanguageCombo.SelectedIndex = LocalizationService.NormalizeLanguageIndex(Services.SettingsService.Get<int>("Language", 0));
             
             int ca = Services.SettingsService.Get<int>("CloseAction", 0);
             if (ca == 0) CloseActionMinimize.IsChecked = true;
@@ -418,6 +401,10 @@ public sealed partial class MainWindow : Window
             AutoStartToggle.IsOn = Services.SettingsService.Get<bool>("AutoStart", false);
         }
         catch { }
+        finally
+        {
+            _isApplyingSettings = false;
+        }
     }
 
     private void SetupSettingsAutoSave()
@@ -431,51 +418,133 @@ public sealed partial class MainWindow : Window
         DensityOverlap.Checked += (s,e) => SaveSettings();
         FontFamilyCombo.SelectionChanged += (s,e) => SaveSettings();
         DanmakuColor.ColorChanged += (s,e) => SaveSettings();
+        BorderColor.ColorChanged += (s,e) => SaveSettings();
+        ShadowColor.ColorChanged += (s,e) => SaveSettings();
         BoldToggle.Toggled += (s,e) => SaveSettings();
+        BorderToggle.Toggled += (s,e) => SaveSettings();
+        BorderThicknessSlider.ValueChanged += (s,e) => SaveSettings();
         ShadowToggle.Toggled += (s,e) => SaveSettings();
+        ShadowBlurSlider.ValueChanged += (s,e) => SaveSettings();
+        ShadowDepthSlider.ValueChanged += (s,e) => SaveSettings();
+        ShadowOpacitySlider.ValueChanged += (s,e) => SaveSettings();
         LanguageCombo.SelectionChanged += (s,e) => SaveSettings();
         CloseActionMinimize.Checked += (s,e) => SaveSettings();
         CloseActionExit.Checked += (s,e) => SaveSettings();
         CloseActionPrompt.Checked += (s,e) => SaveSettings();
         CloseActionPrompt.Unchecked += (s,e) => SaveSettings();
-        AutoStartToggle.Toggled += (s,e) => 
+        AutoStartToggle.Toggled += async (s,e) => 
         {
-            SaveSettings();
-            SetAutoStart(AutoStartToggle.IsOn);
+            if (_isUpdatingAutoStartToggle)
+            {
+                return;
+            }
+
+            await SetAutoStartAsync(AutoStartToggle.IsOn);
         };
     }
 
-    private void SetAutoStart(bool enable)
+    private async Task SyncAutoStartToggleAsync()
     {
         try
         {
-            using var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run", true);
+            var startupTask = await StartupTask.GetAsync(StartupTaskId);
+            ApplyStartupTaskStateToUi(startupTask.State);
+        }
+        catch
+        {
+            _isUpdatingAutoStartToggle = true;
+            AutoStartToggle.IsOn = false;
+            AutoStartToggle.IsEnabled = false;
+            _isUpdatingAutoStartToggle = false;
+            Services.SettingsService.Set("AutoStart", false);
+        }
+    }
+
+    private async Task SetAutoStartAsync(bool enable)
+    {
+        try
+        {
+            AutoStartToggle.IsEnabled = false;
+
+            var startupTask = await StartupTask.GetAsync(StartupTaskId);
+            var state = startupTask.State;
+
             if (enable)
             {
-                // Fix: In unpackaged single-file app, GetCurrentProcess().MainModule.FileName sometimes points to temp extraction folder.
-                // We should use AppContext.BaseDirectory + ExecutableName, or Environment.ProcessPath.
-                string exePath = System.Environment.ProcessPath ?? System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName ?? "";
-                if (!string.IsNullOrEmpty(exePath))
+                if (state == StartupTaskState.Disabled)
                 {
-                    // Adding a space and "autostart" argument so we can know it started automatically
-                    key?.SetValue("KanoDanmaku", $"\"{exePath}\" --autostart");
+                    state = await startupTask.RequestEnableAsync();
+                }
+                else if (state == StartupTaskState.DisabledByUser)
+                {
+                    await ShowStartupTaskMessageAsync(LocalizationService.Instance.StartupDisabledByUserMessage);
+                }
+                else if (state == StartupTaskState.DisabledByPolicy)
+                {
+                    await ShowStartupTaskMessageAsync(LocalizationService.Instance.StartupDisabledByPolicyMessage);
                 }
             }
             else
             {
-                key?.DeleteValue("KanoDanmaku", false);
+                if (state == StartupTaskState.Enabled)
+                {
+                    startupTask.Disable();
+                    state = startupTask.State;
+                }
+                else if (state == StartupTaskState.EnabledByPolicy)
+                {
+                    await ShowStartupTaskMessageAsync(LocalizationService.Instance.StartupEnabledByPolicyMessage);
+                }
             }
+
+            ApplyStartupTaskStateToUi(state);
         }
-        catch { }
+        catch
+        {
+            await ShowStartupTaskMessageAsync(LocalizationService.Instance.StartupTaskUnavailableMessage);
+            await SyncAutoStartToggleAsync();
+        }
+    }
+
+    private void ApplyStartupTaskStateToUi(StartupTaskState state)
+    {
+        bool enabled = state == StartupTaskState.Enabled || state == StartupTaskState.EnabledByPolicy;
+        bool configurable = state != StartupTaskState.DisabledByPolicy && state != StartupTaskState.EnabledByPolicy;
+
+        _isUpdatingAutoStartToggle = true;
+        AutoStartToggle.IsOn = enabled;
+        AutoStartToggle.IsEnabled = configurable;
+        _isUpdatingAutoStartToggle = false;
+
+        Services.SettingsService.Set("AutoStart", enabled);
+    }
+
+    private async Task ShowStartupTaskMessageAsync(string message)
+    {
+        try
+        {
+            var dialog = new ContentDialog
+            {
+                Title = LocalizationService.Instance.DialogTitle,
+                Content = message,
+                CloseButtonText = LocalizationService.Instance.DialogConfirm,
+                XamlRoot = this.Content.XamlRoot
+            };
+
+            await dialog.ShowAsync();
+        }
+        catch
+        {
+        }
     }
 
     private void BtnTest_Click(object sender, RoutedEventArgs e)
     {
         _notificationService_OnNewDanmaku(new damuku_kano.Models.NotificationItem
         {
-            AppName = "Kano弹幕通知",
-            Title = "测试通知",
-            Message = "测试弹幕 - " + DateTime.Now.ToString("HH:mm:ss"),
+            AppName = LocalizationService.Instance.TestNotificationAppName,
+            Title = LocalizationService.Instance.TestNotificationTitle,
+            Message = $"{LocalizationService.Instance.TestNotificationMessagePrefix} - {DateTime.Now:HH:mm:ss}",
             Time = DateTime.Now.ToString("HH:mm")
         });
     }
@@ -486,26 +555,158 @@ public sealed partial class MainWindow : Window
     [DllImport("user32.dll")]
     private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
 
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+
     [DllImport("user32.dll")]
     private static extern bool SetLayeredWindowAttributes(IntPtr hwnd, uint crKey, byte bAlpha, uint dwFlags);
 
     [DllImport("dwmapi.dll")]
     private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int attrValue, int attrSize);
 
+    private const int GWL_EXSTYLE = -20;
+    private const int WS_EX_TRANSPARENT = 0x00000020;
+    private const int WS_EX_TOOLWINDOW = 0x00000080;
+    private const int WS_EX_APPWINDOW = 0x00040000;
+    private const int WS_EX_NOACTIVATE = 0x08000000;
+    private const uint SWP_NOSIZE = 0x0001;
+    private const uint SWP_NOMOVE = 0x0002;
+    private const uint SWP_NOZORDER = 0x0004;
+    private const uint SWP_NOACTIVATE = 0x0010;
+    private const uint SWP_FRAMECHANGED = 0x0020;
+    private const int WM_MOUSEACTIVATE = 0x0021;
+    private const int MA_NOACTIVATE = 3;
+
+    private static void ApplyDanmakuWindowExtendedStyles(System.Windows.Window window)
+    {
+        var hwnd = new System.Windows.Interop.WindowInteropHelper(window).Handle;
+        if (hwnd == IntPtr.Zero)
+        {
+            return;
+        }
+
+        int exStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
+        exStyle &= ~WS_EX_APPWINDOW;
+        exStyle |= WS_EX_TRANSPARENT | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE;
+        SetWindowLong(hwnd, GWL_EXSTYLE, exStyle);
+        SetWindowPos(hwnd, IntPtr.Zero, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+    }
+
+    private static void InitializeDanmakuOverlayWindow(System.Windows.Window window)
+    {
+        ApplyDanmakuWindowExtendedStyles(window);
+
+        var hwnd = new System.Windows.Interop.WindowInteropHelper(window).Handle;
+        var source = System.Windows.Interop.HwndSource.FromHwnd(hwnd);
+        source?.AddHook(DanmakuOverlayWindowProc);
+    }
+
+    private static IntPtr DanmakuOverlayWindowProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+    {
+        if (msg == WM_MOUSEACTIVATE)
+        {
+            handled = true;
+            return new IntPtr(MA_NOACTIVATE);
+        }
+
+        return IntPtr.Zero;
+    }
+
+    private static System.Windows.Media.Color ToWpfColor(Windows.UI.Color color)
+    {
+        return System.Windows.Media.Color.FromArgb(color.A, color.R, color.G, color.B);
+    }
+
     private class TrackInfo
     {
-        public System.Windows.Window Window { get; set; }
+        public System.Windows.Window Window { get; set; } = null!;
+        public System.Windows.FrameworkElement? Element { get; set; }
         public double RightEdge
         {
             get
             {
                 if (Window == null) return -1;
-                var sp = Window.Content as System.Windows.FrameworkElement;
-                return Window.Left + (sp?.DesiredSize.Width ?? 0); 
+                if (Element == null)
+                {
+                    return -1;
+                }
+
+                double x = 0;
+                if (Element.GetValue(System.Windows.Controls.Canvas.LeftProperty) is double left && !double.IsNaN(left))
+                {
+                    x = left;
+                }
+
+                double width = Element.ActualWidth > 0 ? Element.ActualWidth : Element.DesiredSize.Width;
+                return Window.Left + x + width;
             }
         }
     }
-    private TrackInfo[] _tracks = new TrackInfo[200];
+
+    private sealed class OutlinedTextElement : System.Windows.FrameworkElement
+    {
+        public string Text { get; init; } = string.Empty;
+        public System.Windows.Media.FontFamily FontFamily { get; init; } = new("Microsoft YaHei");
+        public double FontSize { get; init; }
+        public System.Windows.FontWeight FontWeight { get; init; } = System.Windows.FontWeights.Normal;
+        public System.Windows.Media.Brush Fill { get; init; } = System.Windows.Media.Brushes.White;
+        public System.Windows.Media.Brush? Stroke { get; init; }
+        public double StrokeThickness { get; init; }
+
+        protected override System.Windows.Size MeasureOverride(System.Windows.Size availableSize)
+        {
+            var text = CreateFormattedText();
+            return new System.Windows.Size(
+                text.WidthIncludingTrailingWhitespace + StrokeThickness * 2,
+                text.Height + StrokeThickness * 2);
+        }
+
+        protected override void OnRender(System.Windows.Media.DrawingContext drawingContext)
+        {
+            base.OnRender(drawingContext);
+
+            var text = CreateFormattedText();
+            var geometry = text.BuildGeometry(new System.Windows.Point(StrokeThickness, StrokeThickness));
+            var pen = Stroke != null && StrokeThickness > 0
+                ? new System.Windows.Media.Pen(Stroke, StrokeThickness)
+                : null;
+
+            if (pen != null)
+            {
+                pen.LineJoin = System.Windows.Media.PenLineJoin.Round;
+            }
+
+            drawingContext.DrawGeometry(Fill, pen, geometry);
+        }
+
+        private System.Windows.Media.FormattedText CreateFormattedText()
+        {
+            double pixelsPerDip;
+            try
+            {
+                pixelsPerDip = System.Windows.Media.VisualTreeHelper.GetDpi(this).PixelsPerDip;
+            }
+            catch
+            {
+                pixelsPerDip = 1.0;
+            }
+
+            return new System.Windows.Media.FormattedText(
+                Text,
+                CultureInfo.CurrentUICulture,
+                System.Windows.FlowDirection.LeftToRight,
+                new System.Windows.Media.Typeface(
+                    FontFamily,
+                    System.Windows.FontStyles.Normal,
+                    FontWeight,
+                    System.Windows.FontStretches.Normal),
+                FontSize,
+                Fill,
+                pixelsPerDip);
+        }
+    }
+
+    private TrackInfo?[] _tracks = new TrackInfo?[200];
 
     private async void _notificationService_OnNewDanmaku(damuku_kano.Models.NotificationItem item)
     {
@@ -519,9 +720,12 @@ public sealed partial class MainWindow : Window
             Background = System.Windows.Media.Brushes.Transparent,
             Topmost = true,
             ShowInTaskbar = false,
+            ShowActivated = false,
             SizeToContent = System.Windows.SizeToContent.WidthAndHeight,
+            Focusable = false,
             IsHitTestVisible = false // 鼠标穿透
         };
+        danmakuWindow.SourceInitialized += (_, _) => InitializeDanmakuOverlayWindow(danmakuWindow);
 
         var screenWidth = System.Windows.SystemParameters.WorkArea.Width;
         var screenHeight = System.Windows.SystemParameters.WorkArea.Height;
@@ -552,7 +756,8 @@ public sealed partial class MainWindow : Window
 
         for (int i = startTrack; i < endTrack; i++)
         {
-            if (_tracks[i] == null || _tracks[i].RightEdge < screenWidth - minGap)
+            var track = _tracks[i];
+            if (track == null || track.RightEdge < screenWidth - minGap)
             {
                 availableTracks.Add(i);
             }
@@ -580,18 +785,16 @@ public sealed partial class MainWindow : Window
 
         int y = (int)(selectedTrack * trackHeight);
 
-        danmakuWindow.Left = spawnX;
-        danmakuWindow.Top = y;
+        string selectedFontName = GetSelectedFontFamilyName();
+        System.Windows.Media.FontFamily fontFamily = string.IsNullOrWhiteSpace(selectedFontName)
+            ? new System.Windows.Media.FontFamily("Microsoft YaHei")
+            : new System.Windows.Media.FontFamily(selectedFontName);
 
-        System.Windows.Media.FontFamily fontFamily = new System.Windows.Media.FontFamily("Microsoft YaHei");
-        if (FontFamilyCombo != null && FontFamilyCombo.SelectedItem is ComboBoxItem cbi)
-        {
-            string fd = cbi.Content.ToString();
-            if (fd != "默认字体") fontFamily = new System.Windows.Media.FontFamily(fd);
-        }
-
-        var col = DanmakuColor.Color;
-        var myBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(col.A, col.R, col.G, col.B));
+        var danmakuBrush = new System.Windows.Media.SolidColorBrush(ToWpfColor(DanmakuColor.Color));
+        double borderThickness = BorderToggle?.IsOn == true ? Math.Max(0, BorderThicknessSlider.Value) : 0;
+        System.Windows.Media.Brush? borderBrush = borderThickness > 0
+            ? new System.Windows.Media.SolidColorBrush(ToWpfColor(BorderColor.Color))
+            : null;
 
         // Load Icon
         System.Windows.Media.ImageSource? iconSource = null;
@@ -617,23 +820,25 @@ public sealed partial class MainWindow : Window
             catch { }
         }
 
-        // 构建弹幕外观：只需文字带边缘黑色阴影或发光即可（无边框纯净的抗锯齿效果）
-        var textBlock = new System.Windows.Controls.TextBlock
+        var textBlock = new OutlinedTextElement
         {
             Text = msg,
             FontSize = fontSize,
             FontFamily = fontFamily,
             FontWeight = BoldToggle?.IsOn != false ? System.Windows.FontWeights.Bold : System.Windows.FontWeights.Normal,
-            Foreground = myBrush,
-            VerticalAlignment = System.Windows.VerticalAlignment.Center
+            Fill = danmakuBrush,
+            Stroke = borderBrush,
+            StrokeThickness = borderThickness,
+            VerticalAlignment = System.Windows.VerticalAlignment.Center,
+            SnapsToDevicePixels = false
         };
 
-        var effect = ShadowToggle?.IsOn != false ? new System.Windows.Media.Effects.DropShadowEffect // 加上阴影使得弹幕在任何颜色背景下即使没有底色也能看清楚
+        var effect = ShadowToggle?.IsOn != false ? new System.Windows.Media.Effects.DropShadowEffect
         {
-            Color = System.Windows.Media.Colors.Black,
-            BlurRadius = 4,
-            ShadowDepth = 2,
-            Opacity = 1
+            Color = ToWpfColor(ShadowColor.Color),
+            BlurRadius = Math.Max(0, ShadowBlurSlider.Value),
+            ShadowDepth = Math.Max(0, ShadowDepthSlider.Value),
+            Opacity = Math.Clamp(ShadowOpacitySlider.Value / 100.0, 0, 1)
         } : null;
 
         var stackPanel = new System.Windows.Controls.StackPanel
@@ -659,26 +864,23 @@ public sealed partial class MainWindow : Window
         
         stackPanel.Children.Add(textBlock);
 
+        danmakuWindow.Left = spawnX;
+        danmakuWindow.Top = y;
         danmakuWindow.Content = stackPanel;
 
         double currentX = spawnX;
         double speed = SpeedSlider != null ? SpeedSlider.Value : 6.0;
 
-        // To calculate element width, measure it before it is fully rendered (or just use a big enough assumed stop coordinate)
         stackPanel.Measure(new System.Windows.Size(double.PositiveInfinity, double.PositiveInfinity));
         double targetX = -stackPanel.DesiredSize.Width - 50;
 
-        _tracks[selectedTrack] = new TrackInfo { Window = danmakuWindow };
+        _tracks[selectedTrack] = new TrackInfo { Window = danmakuWindow, Element = stackPanel };
 
         danmakuWindow.Show();
 
-        // 再次强制鼠标穿透（WS_EX_TRANSPARENT）来配合 WPF 的透明底
+        // 再次确认 overlay 样式，防止 WPF 在 Show 过程中覆盖扩展样式。
+        ApplyDanmakuWindowExtendedStyles(danmakuWindow);
         var hwnd = new System.Windows.Interop.WindowInteropHelper(danmakuWindow).Handle;
-        const int GWL_EXSTYLE = -20;
-        const int WS_EX_TRANSPARENT = 0x00000020;
-        const int WS_EX_TOOLWINDOW = 0x00000080;
-        int exStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
-        SetWindowLong(hwnd, GWL_EXSTYLE, exStyle | WS_EX_TRANSPARENT | WS_EX_TOOLWINDOW);
 
         // 针对具体的弹幕窗口，进一步确保 CompositionTarget 采用硬件渲染
         var hwndSource = System.Windows.Interop.HwndSource.FromHwnd(hwnd);
@@ -687,9 +889,9 @@ public sealed partial class MainWindow : Window
             hwndSource.CompositionTarget.RenderMode = System.Windows.Interop.RenderMode.Default;
         }
 
-        // Animate the window based on actual monitor frame deltas using CompositionTarget
+        // Animate the top-level transparent window based on monitor frame deltas.
         long lastTime = 0;
-        EventHandler renderingHandler = null;
+        EventHandler? renderingHandler = null;
         renderingHandler = (s, e) =>
         {
             var args = (System.Windows.Media.RenderingEventArgs)e;
@@ -699,7 +901,6 @@ public sealed partial class MainWindow : Window
                 return;
             }
 
-            // ticks diff / 16.66ms representing elapsed frame count ratio (assuming speed was based on 60fps)
             double dtFrames = (args.RenderingTime.Ticks - lastTime) / 166666.666;
             lastTime = args.RenderingTime.Ticks;
 
@@ -707,7 +908,11 @@ public sealed partial class MainWindow : Window
 
             if (currentX <= targetX)
             {
-                System.Windows.Media.CompositionTarget.Rendering -= renderingHandler;
+                if (renderingHandler != null)
+                {
+                    System.Windows.Media.CompositionTarget.Rendering -= renderingHandler;
+                }
+
                 danmakuWindow.Close();
                 if (_tracks[selectedTrack]?.Window == danmakuWindow)
                 {

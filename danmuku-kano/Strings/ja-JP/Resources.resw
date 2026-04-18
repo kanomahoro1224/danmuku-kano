@@ -30,7 +30,14 @@
   <data name="TextDefaultFont" xml:space="preserve"><value>デフォルト</value></data>
   <data name="TextDanmakuColorConfig" xml:space="preserve"><value>色設定</value></data>
   <data name="TextBold" xml:space="preserve"><value>太字</value></data>
+  <data name="TextBorder" xml:space="preserve"><value>文字の縁取り</value></data>
+  <data name="TextBorderColorConfig" xml:space="preserve"><value>縁取りの色</value></data>
+  <data name="TextBorderThickness" xml:space="preserve"><value>縁取りの太さ</value></data>
   <data name="TextShadow" xml:space="preserve"><value>発光 / 影効果</value></data>
+  <data name="TextShadowColorConfig" xml:space="preserve"><value>影の色</value></data>
+  <data name="TextShadowBlur" xml:space="preserve"><value>影のぼかし</value></data>
+  <data name="TextShadowDepth" xml:space="preserve"><value>影の距離</value></data>
+  <data name="TextShadowOpacity" xml:space="preserve"><value>影の不透明度(%)</value></data>
   <data name="TextTestDanmaku" xml:space="preserve"><value>テスト弾幕を送信</value></data>
   <data name="TextSystemSettings" xml:space="preserve"><value>システム設定</value></data>
   <data name="TextLanguage" xml:space="preserve"><value>言語</value></data>
@@ -54,4 +61,15 @@
   <data name="TestNotificationAppName" xml:space="preserve"><value>Kano 弾幕通知</value></data>
   <data name="TestNotificationTitle" xml:space="preserve"><value>テスト通知</value></data>
   <data name="TestNotificationMessagePrefix" xml:space="preserve"><value>テスト弾幕</value></data>
+  <data name="StartupDisabledByUserMessage" xml:space="preserve"><value>Windows でこのアプリの自動起動がユーザーによって無効にされています。Windows の設定 &gt; アプリ &gt; スタートアップ、またはタスク マネージャー &gt; スタートアップ アプリで Kano を手動で有効にしてください。</value></data>
+  <data name="StartupDisabledByPolicyMessage" xml:space="preserve"><value>Windows ポリシーにより、このアプリの自動起動が現在禁止されています。システム管理者またはグループ ポリシー設定を確認してください。</value></data>
+  <data name="StartupEnabledByPolicyMessage" xml:space="preserve"><value>Windows ポリシーにより、このアプリの自動起動が強制されているため、アプリ内では無効にできません。</value></data>
+  <data name="StartupTaskUnavailableMessage" xml:space="preserve"><value>Windows のスタートアップ タスクを読み取りまたは変更できません。現在実行しているアプリが MSIX パッケージ版であることを確認してください。</value></data>
+  <data name="NavAbout" xml:space="preserve"><value>情報</value></data>
+  <data name="AboutProductName" xml:space="preserve"><value>Kano 弾幕通知</value></data>
+  <data name="AboutVersionTemplate" xml:space="preserve"><value>{0}-release ({1})</value></data>
+  <data name="AboutArchitecture64" xml:space="preserve"><value>64 ビット</value></data>
+  <data name="AboutArchitecture32" xml:space="preserve"><value>32 ビット</value></data>
+  <data name="AboutMadeByPrefix" xml:space="preserve"><value>鹿可可 が</value></data>
+  <data name="AboutMadeBySuffix" xml:space="preserve"><value>で制作</value></data>
 </root>

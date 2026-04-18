@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Xaml.Shapes;
+using damuku_kano.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -34,15 +35,7 @@ namespace damuku_kano
         /// </summary>
         public App()
         {
-            try
-            {
-                int lang = Services.SettingsService.Get<int>("Language", 0);
-                if (lang == 0) Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = "zh-Hans";
-                else if (lang == 1) Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = "zh-Hant";
-                else if (lang == 2) Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = "en-US";
-                else if (lang == 3) Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = "ja-JP";
-            }
-            catch { }
+            LocalizationService.Instance.ApplySavedLanguage();
 
             InitializeComponent();
         }

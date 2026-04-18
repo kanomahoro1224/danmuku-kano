@@ -15,6 +15,7 @@ public sealed class LocalizationService : INotifyPropertyChanged
     public string AppTitle => GetString(nameof(AppTitle));
     public string NavStyle => GetString(nameof(NavStyle));
     public string NavHistory => GetString(nameof(NavHistory));
+    public string NavAbout => GetString(nameof(NavAbout));
     public string TextProjectBasedOn => GetString(nameof(TextProjectBasedOn));
     public string TextNoNativeTransparency => GetString(nameof(TextNoNativeTransparency));
     public string TextComplexHooks => GetString(nameof(TextComplexHooks));
@@ -30,7 +31,14 @@ public sealed class LocalizationService : INotifyPropertyChanged
     public string TextDefaultFont => GetString(nameof(TextDefaultFont));
     public string TextDanmakuColorConfig => GetString(nameof(TextDanmakuColorConfig));
     public string TextBold => GetString(nameof(TextBold));
+    public string TextBorder => GetString(nameof(TextBorder));
+    public string TextBorderColorConfig => GetString(nameof(TextBorderColorConfig));
+    public string TextBorderThickness => GetString(nameof(TextBorderThickness));
     public string TextShadow => GetString(nameof(TextShadow));
+    public string TextShadowColorConfig => GetString(nameof(TextShadowColorConfig));
+    public string TextShadowBlur => GetString(nameof(TextShadowBlur));
+    public string TextShadowDepth => GetString(nameof(TextShadowDepth));
+    public string TextShadowOpacity => GetString(nameof(TextShadowOpacity));
     public string TextTestDanmaku => GetString(nameof(TextTestDanmaku));
     public string TextSystemSettings => GetString(nameof(TextSystemSettings));
     public string TextLanguage => GetString(nameof(TextLanguage));
@@ -54,6 +62,21 @@ public sealed class LocalizationService : INotifyPropertyChanged
     public string TestNotificationAppName => GetString(nameof(TestNotificationAppName));
     public string TestNotificationTitle => GetString(nameof(TestNotificationTitle));
     public string TestNotificationMessagePrefix => GetString(nameof(TestNotificationMessagePrefix));
+    public string StartupDisabledByUserMessage => GetString(nameof(StartupDisabledByUserMessage));
+    public string StartupDisabledByPolicyMessage => GetString(nameof(StartupDisabledByPolicyMessage));
+    public string StartupEnabledByPolicyMessage => GetString(nameof(StartupEnabledByPolicyMessage));
+    public string StartupTaskUnavailableMessage => GetString(nameof(StartupTaskUnavailableMessage));
+    public string AboutProductName => GetString(nameof(AboutProductName));
+    public string AboutVersionTemplate => GetString(nameof(AboutVersionTemplate));
+    public string AboutArchitecture64 => GetString(nameof(AboutArchitecture64));
+    public string AboutArchitecture32 => GetString(nameof(AboutArchitecture32));
+    public string AboutMadeByPrefix => GetString(nameof(AboutMadeByPrefix));
+    public string AboutMadeBySuffix => GetString(nameof(AboutMadeBySuffix));
+
+    public static int NormalizeLanguageIndex(int languageIndex)
+    {
+        return languageIndex is >= 0 and <= 3 ? languageIndex : 0;
+    }
 
     public void ApplySavedLanguage()
     {
@@ -62,6 +85,8 @@ public sealed class LocalizationService : INotifyPropertyChanged
 
     public void ApplyLanguage(int languageIndex)
     {
+        languageIndex = NormalizeLanguageIndex(languageIndex);
+
         try
         {
             Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = languageIndex switch
@@ -82,7 +107,14 @@ public sealed class LocalizationService : INotifyPropertyChanged
 
     private string GetString(string key)
     {
-        string value = _resourceLoader.GetString(key);
-        return string.IsNullOrWhiteSpace(value) ? key : value;
+        try
+        {
+            string value = _resourceLoader.GetString(key);
+            return string.IsNullOrWhiteSpace(value) ? key : value;
+        }
+        catch
+        {
+            return key;
+        }
     }
 }
