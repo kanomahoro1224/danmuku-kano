@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppTitle" xml:space="preserve"><value>Kano 탄막 알림</value></data>
+  <data name="NavStyle" xml:space="preserve"><value>탄막 스타일</value></data>
+  <data name="NavHistory" xml:space="preserve"><value>알림 기록</value></data>
+  <data name="TextProjectBasedOn" xml:space="preserve"><value>이 프로젝트는 Windows App SDK (WinUI 3) 기반입니다.</value></data>
+  <data name="TextNoNativeTransparency" xml:space="preserve"><value>WinUI 3은 현재 투명한 테두리 없는 창을 기본 지원하지 않아,</value></data>
+  <data name="TextComplexHooks" xml:space="preserve"><value>탄막 렌더링은 별도의 WPF 투명 호스트 레이어에서 처리하며, 메인 창을 닫아도 계속 작동합니다.</value></data>
+  <data name="TextFontSize" xml:space="preserve"><value>글꼴 크기(%)</value></data>
+  <data name="TextSpeed" xml:space="preserve"><value>탄막 속도</value></data>
+  <data name="TextOpacity" xml:space="preserve"><value>불투명도(%)</value></data>
+  <data name="TextDisplayArea" xml:space="preserve"><value>표시 영역(%)</value></data>
+  <data name="TextDensity" xml:space="preserve"><value>탄막 밀도</value></data>
+  <data name="TextDensityNormal" xml:space="preserve"><value>보통</value></data>
+  <data name="TextDensityMore" xml:space="preserve"><value>많음</value></data>
+  <data name="TextDensityOverlap" xml:space="preserve"><value>겹침 허용</value></data>
+  <data name="TextDisplayScreen" xml:space="preserve"><value>표시 화면</value></data>
+  <data name="TextScreenPrimary" xml:space="preserve"><value>주 화면만</value></data>
+  <data name="TextScreenAll" xml:space="preserve"><value>모든 화면</value></data>
+  <data name="TextScreenMouse" xml:space="preserve"><value>마우스 위치 화면</value></data>
+  <data name="TextFontAndColor" xml:space="preserve"><value>색상 및 글꼴</value></data>
+  <data name="TextDefaultFont" xml:space="preserve"><value>기본 글꼴</value></data>
+  <data name="TextDanmakuColorConfig" xml:space="preserve"><value>탄막 색상 설정</value></data>
+  <data name="TextBold" xml:space="preserve"><value>굵게 사용</value></data>
+  <data name="TextBorder" xml:space="preserve"><value>텍스트 테두리</value></data>
+  <data name="TextBorderColorConfig" xml:space="preserve"><value>테두리 색상</value></data>
+  <data name="TextBorderThickness" xml:space="preserve"><value>테두리 두께</value></data>
+  <data name="TextShadow" xml:space="preserve"><value>글로우/그림자 효과</value></data>
+  <data name="TextShadowColorConfig" xml:space="preserve"><value>그림자 색상</value></data>
+  <data name="TextShadowBlur" xml:space="preserve"><value>그림자 블러</value></data>
+  <data name="TextShadowDepth" xml:space="preserve"><value>그림자 오프셋</value></data>
+  <data name="TextShadowOpacity" xml:space="preserve"><value>그림자 불투명도(%)</value></data>
+  <data name="TextTestDanmaku" xml:space="preserve"><value>테스트 알림 탄막 보내기 (디버그)</value></data>
+  <data name="TextSystemSettings" xml:space="preserve"><value>시스템 설정</value></data>
+  <data name="TextLanguage" xml:space="preserve"><value>인터페이스 언어</value></data>
+  <data name="TextLanguageHans" xml:space="preserve"><value>简体中文</value></data>
+  <data name="TextLanguageHant" xml:space="preserve"><value>繁體中文</value></data>
+  <data name="TextLanguageEn" xml:space="preserve"><value>English</value></data>
+  <data name="TextLanguageJa" xml:space="preserve"><value>日本語</value></data>
+  <data name="TextLanguageKo" xml:space="preserve"><value>한국어</value></data>
+  <data name="TextLanguageFr" xml:space="preserve"><value>Français</value></data>
+  <data name="TextLanguageDe" xml:space="preserve"><value>Deutsch</value></data>
+  <data name="TextLanguageEs" xml:space="preserve"><value>Español</value></data>
+  <data name="TextLanguagePtBr" xml:space="preserve"><value>Português (Brasil)</value></data>
+  <data name="TextLanguageRu" xml:space="preserve"><value>Русский</value></data>
+  <data name="TextLanguageIt" xml:space="preserve"><value>Italiano</value></data>
+  <data name="TextLanguageTr" xml:space="preserve"><value>Türkçe</value></data>
+  <data name="TextCloseAction" xml:space="preserve"><value>메인 창 닫기 시:</value></data>
+  <data name="TextMinimizeToTray" xml:space="preserve"><value>시스템 트레이로 최소화</value></data>
+  <data name="TextExitApp" xml:space="preserve"><value>프로그램 종료</value></data>
+  <data name="TextClosePrompt" xml:space="preserve"><value>닫을 때 확인</value></data>
+  <data name="TextAutoStart" xml:space="preserve"><value>Windows 시작 시 자동 실행</value></data>
+  <data name="TrayAppShow" xml:space="preserve"><value>메인 창 표시</value></data>
+  <data name="TrayAppExit" xml:space="preserve"><value>완전히 종료</value></data>
+  <data name="DialogTitle" xml:space="preserve"><value>알림</value></data>
+  <data name="DialogConfirmMin" xml:space="preserve"><value>시스템 트레이로 최소화하시겠습니까?</value></data>
+  <data name="DialogConfirmExit" xml:space="preserve"><value>프로그램을 종료하시겠습니까?</value></data>
+  <data name="DialogConfirm" xml:space="preserve"><value>확인</value></data>
+  <data name="DialogCancel" xml:space="preserve"><value>취소</value></data>
+  <data name="NotificationFallbackAppName" xml:space="preserve"><value>시스템 알림</value></data>
+  <data name="TestNotificationAppName" xml:space="preserve"><value>Kano 탄막 알림</value></data>
+  <data name="TestNotificationTitle" xml:space="preserve"><value>테스트 알림</value></data>
+  <data name="TestNotificationMessagePrefix" xml:space="preserve"><value>테스트 탄막</value></data>
+  <data name="StartupDisabledByUserMessage" xml:space="preserve"><value>Windows에서 이 앱의 시작 프로그램이 비활성화되어 있습니다. Windows 설정 &gt; 앱 &gt; 시작 프로그램 또는 작업 관리자 &gt; 시작 앱에서 Kano를 수동으로 활성화해 주세요.</value></data>
+  <data name="StartupDisabledByPolicyMessage" xml:space="preserve"><value>Windows 정책에 의해 이 앱의 시작 프로그램이 금지되어 있습니다. 시스템 관리자 또는 그룹 정책 설정을 확인해 주세요.</value></data>
+  <data name="StartupEnabledByPolicyMessage" xml:space="preserve"><value>Windows 정책에 의해 이 앱의 시작 프로그램이 강제 활성화되어 있어, 앱 내에서 비활성화할 수 없습니다.</value></data>
+  <data name="StartupTaskUnavailableMessage" xml:space="preserve"><value>Windows 시작 프로그램 작업을 읽거나 수정할 수 없습니다. MSIX 패키지 버전으로 실행 중인지 확인해 주세요.</value></data>
+  <data name="NavAbout" xml:space="preserve"><value>정보</value></data>
+  <data name="AboutProductName" xml:space="preserve"><value>Kano 탄막 알림</value></data>
+  <data name="AboutVersionTemplate" xml:space="preserve"><value>{0}-release ({1})</value></data>
+  <data name="AboutArchitecture64" xml:space="preserve"><value>64비트</value></data>
+  <data name="AboutArchitecture32" xml:space="preserve"><value>32비트</value></data>
+  <data name="AboutMadeByPrefix" xml:space="preserve"><value>鹿可可이</value></data>
+  <data name="AboutMadeBySuffix" xml:space="preserve"><value>로 제작</value></data>
+</root>

@@ -1,5 +1,4 @@
 using System;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,9 +7,7 @@ using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using damuku_kano.Services;
-using System.Runtime.InteropServices;
 using WinRT.Interop;
-using System.Windows.Interop;
 using System.Windows.Media;
 using Windows.ApplicationModel;
 
@@ -20,6 +17,7 @@ public sealed partial class MainWindow : Window
 {
     private const string StartupTaskId = "KanoDanmakuStartupId";
     private NotificationService _notificationService;
+    private Direct2DDanmakuRenderer _renderer;
     private System.Windows.Forms.NotifyIcon _notifyIcon = null!;
     private bool _isUpdatingAutoStartToggle;
     private bool _isApplyingSettings;
@@ -59,13 +57,16 @@ public sealed partial class MainWindow : Window
         SetupSettingsAutoSave();
         _ = SyncAutoStartToggleAsync();
 
+        _renderer = new Direct2DDanmakuRenderer();
+        _renderer.Start();
+
         _notificationService = new NotificationService();
-        _notificationService.OnNewDanmaku += _notificationService_OnNewDanmaku;
-        
+        _notificationService.OnNewDanmaku += OnNewDanmaku;
+
         HistoryList.ItemsSource = _notificationService.History;
-        
+
         NavView.SelectedItem = NavView.MenuItems[0];
-        
+
         _ = _notificationService.InitializeAsync();
     }
 
@@ -140,6 +141,7 @@ public sealed partial class MainWindow : Window
         {
             _notifyIcon.Visible = false;
             _notifyIcon.Dispose();
+            _renderer.Dispose();
             Microsoft.UI.Xaml.Application.Current.Exit();
         };
         contextMenu.Items.Add(showItem);
@@ -181,6 +183,7 @@ public sealed partial class MainWindow : Window
         {
             _notifyIcon.Visible = false;
             _notifyIcon.Dispose();
+            _renderer.Dispose();
         }
     }
 
@@ -196,6 +199,7 @@ public sealed partial class MainWindow : Window
         Services.SettingsService.Set("Opacity", OpacitySlider.Value);
         Services.SettingsService.Set("DisplayArea", DisplayAreaSlider.Value);
         Services.SettingsService.Set("Density", DensityNormal.IsChecked == true ? 0 : (DensityMore.IsChecked == true ? 1 : 2));
+        Services.SettingsService.Set("DisplayScreenMode", ScreenPrimary.IsChecked == true ? 0 : (ScreenAll.IsChecked == true ? 1 : 2));
         Services.SettingsService.Set("FontFamilyName", GetSelectedFontFamilyName());
         
         var color = DanmakuColor.Color;
@@ -360,7 +364,12 @@ public sealed partial class MainWindow : Window
             if (den == 0) DensityNormal.IsChecked = true;
             else if (den == 1) DensityMore.IsChecked = true;
             else DensityOverlap.IsChecked = true;
-            
+
+            int screenMode = Services.SettingsService.Get<int>("DisplayScreenMode", 0);
+            if (screenMode == 0) ScreenPrimary.IsChecked = true;
+            else if (screenMode == 1) ScreenAll.IsChecked = true;
+            else ScreenMouse.IsChecked = true;
+
             string? selectedFontName = Services.SettingsService.Get<string>("FontFamilyName");
             if (string.IsNullOrWhiteSpace(selectedFontName))
             {
@@ -416,6 +425,9 @@ public sealed partial class MainWindow : Window
         DensityNormal.Checked += (s,e) => SaveSettings();
         DensityMore.Checked += (s,e) => SaveSettings();
         DensityOverlap.Checked += (s,e) => SaveSettings();
+        ScreenPrimary.Checked += (s,e) => SaveSettings();
+        ScreenAll.Checked += (s,e) => SaveSettings();
+        ScreenMouse.Checked += (s,e) => SaveSettings();
         FontFamilyCombo.SelectionChanged += (s,e) => SaveSettings();
         DanmakuColor.ColorChanged += (s,e) => SaveSettings();
         BorderColor.ColorChanged += (s,e) => SaveSettings();
@@ -540,391 +552,43 @@ public sealed partial class MainWindow : Window
 
     private void BtnTest_Click(object sender, RoutedEventArgs e)
     {
-        _notificationService_OnNewDanmaku(new damuku_kano.Models.NotificationItem
-        {
-            AppName = LocalizationService.Instance.TestNotificationAppName,
-            Title = LocalizationService.Instance.TestNotificationTitle,
-            Message = $"{LocalizationService.Instance.TestNotificationMessagePrefix} - {DateTime.Now:HH:mm:ss}",
-            Time = DateTime.Now.ToString("HH:mm")
-        });
+        var settings = DanmakuStyleSettings.Load();
+        string text = $"{LocalizationService.Instance.TestNotificationAppName}: {LocalizationService.Instance.TestNotificationTitle} {LocalizationService.Instance.TestNotificationMessagePrefix} - {DateTime.Now:HH:mm:ss}";
+        _renderer.ShowDanmaku(text, null, settings, System.Windows.Forms.Screen.PrimaryScreen);
     }
 
-    [DllImport("user32.dll", SetLastError = true)]
-    private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
-
-    [DllImport("user32.dll")]
-    private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
-
-    [DllImport("user32.dll", SetLastError = true)]
-    private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
-
-    [DllImport("user32.dll")]
-    private static extern bool SetLayeredWindowAttributes(IntPtr hwnd, uint crKey, byte bAlpha, uint dwFlags);
-
-    [DllImport("dwmapi.dll")]
-    private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int attrValue, int attrSize);
-
-    private const int GWL_EXSTYLE = -20;
-    private const int WS_EX_TRANSPARENT = 0x00000020;
-    private const int WS_EX_TOOLWINDOW = 0x00000080;
-    private const int WS_EX_APPWINDOW = 0x00040000;
-    private const int WS_EX_NOACTIVATE = 0x08000000;
-    private const uint SWP_NOSIZE = 0x0001;
-    private const uint SWP_NOMOVE = 0x0002;
-    private const uint SWP_NOZORDER = 0x0004;
-    private const uint SWP_NOACTIVATE = 0x0010;
-    private const uint SWP_FRAMECHANGED = 0x0020;
-    private const int WM_MOUSEACTIVATE = 0x0021;
-    private const int MA_NOACTIVATE = 3;
-
-    private static void ApplyDanmakuWindowExtendedStyles(System.Windows.Window window)
+    private async void OnNewDanmaku(damuku_kano.Models.NotificationItem item)
     {
-        var hwnd = new System.Windows.Interop.WindowInteropHelper(window).Handle;
-        if (hwnd == IntPtr.Zero)
-        {
-            return;
-        }
+        string text = $"{item.AppName}: {item.Title} {item.Message}";
+        byte[]? iconPng = null;
 
-        int exStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
-        exStyle &= ~WS_EX_APPWINDOW;
-        exStyle |= WS_EX_TRANSPARENT | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE;
-        SetWindowLong(hwnd, GWL_EXSTYLE, exStyle);
-        SetWindowPos(hwnd, IntPtr.Zero, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
-    }
-
-    private static void InitializeDanmakuOverlayWindow(System.Windows.Window window)
-    {
-        ApplyDanmakuWindowExtendedStyles(window);
-
-        var hwnd = new System.Windows.Interop.WindowInteropHelper(window).Handle;
-        var source = System.Windows.Interop.HwndSource.FromHwnd(hwnd);
-        source?.AddHook(DanmakuOverlayWindowProc);
-    }
-
-    private static IntPtr DanmakuOverlayWindowProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
-    {
-        if (msg == WM_MOUSEACTIVATE)
-        {
-            handled = true;
-            return new IntPtr(MA_NOACTIVATE);
-        }
-
-        return IntPtr.Zero;
-    }
-
-    private static System.Windows.Media.Color ToWpfColor(Windows.UI.Color color)
-    {
-        return System.Windows.Media.Color.FromArgb(color.A, color.R, color.G, color.B);
-    }
-
-    private class TrackInfo
-    {
-        public System.Windows.Window Window { get; set; } = null!;
-        public System.Windows.FrameworkElement? Element { get; set; }
-        public double RightEdge
-        {
-            get
-            {
-                if (Window == null) return -1;
-                if (Element == null)
-                {
-                    return -1;
-                }
-
-                double x = 0;
-                if (Element.GetValue(System.Windows.Controls.Canvas.LeftProperty) is double left && !double.IsNaN(left))
-                {
-                    x = left;
-                }
-
-                double width = Element.ActualWidth > 0 ? Element.ActualWidth : Element.DesiredSize.Width;
-                return Window.Left + x + width;
-            }
-        }
-    }
-
-    private sealed class OutlinedTextElement : System.Windows.FrameworkElement
-    {
-        public string Text { get; init; } = string.Empty;
-        public System.Windows.Media.FontFamily FontFamily { get; init; } = new("Microsoft YaHei");
-        public double FontSize { get; init; }
-        public System.Windows.FontWeight FontWeight { get; init; } = System.Windows.FontWeights.Normal;
-        public System.Windows.Media.Brush Fill { get; init; } = System.Windows.Media.Brushes.White;
-        public System.Windows.Media.Brush? Stroke { get; init; }
-        public double StrokeThickness { get; init; }
-
-        protected override System.Windows.Size MeasureOverride(System.Windows.Size availableSize)
-        {
-            var text = CreateFormattedText();
-            return new System.Windows.Size(
-                text.WidthIncludingTrailingWhitespace + StrokeThickness * 2,
-                text.Height + StrokeThickness * 2);
-        }
-
-        protected override void OnRender(System.Windows.Media.DrawingContext drawingContext)
-        {
-            base.OnRender(drawingContext);
-
-            var text = CreateFormattedText();
-            var geometry = text.BuildGeometry(new System.Windows.Point(StrokeThickness, StrokeThickness));
-            var pen = Stroke != null && StrokeThickness > 0
-                ? new System.Windows.Media.Pen(Stroke, StrokeThickness)
-                : null;
-
-            if (pen != null)
-            {
-                pen.LineJoin = System.Windows.Media.PenLineJoin.Round;
-            }
-
-            drawingContext.DrawGeometry(Fill, pen, geometry);
-        }
-
-        private System.Windows.Media.FormattedText CreateFormattedText()
-        {
-            double pixelsPerDip;
-            try
-            {
-                pixelsPerDip = System.Windows.Media.VisualTreeHelper.GetDpi(this).PixelsPerDip;
-            }
-            catch
-            {
-                pixelsPerDip = 1.0;
-            }
-
-            return new System.Windows.Media.FormattedText(
-                Text,
-                CultureInfo.CurrentUICulture,
-                System.Windows.FlowDirection.LeftToRight,
-                new System.Windows.Media.Typeface(
-                    FontFamily,
-                    System.Windows.FontStyles.Normal,
-                    FontWeight,
-                    System.Windows.FontStretches.Normal),
-                FontSize,
-                Fill,
-                pixelsPerDip);
-        }
-    }
-
-    private TrackInfo?[] _tracks = new TrackInfo?[200];
-
-    private async void _notificationService_OnNewDanmaku(damuku_kano.Models.NotificationItem item)
-    {
-        string msg = $"{item.AppName}: {item.Title} {item.Message}";
-
-        // 采用隐藏引用的 WPF 创建纯透明弹幕层（根据原始代码建议，WPF 更适合带阴影和平滑抗锯齿边缘的透明层效果）
-        var danmakuWindow = new System.Windows.Window
-        {
-            WindowStyle = System.Windows.WindowStyle.None,
-            AllowsTransparency = true,
-            Background = System.Windows.Media.Brushes.Transparent,
-            Topmost = true,
-            ShowInTaskbar = false,
-            ShowActivated = false,
-            SizeToContent = System.Windows.SizeToContent.WidthAndHeight,
-            Focusable = false,
-            IsHitTestVisible = false // 鼠标穿透
-        };
-        danmakuWindow.SourceInitialized += (_, _) => InitializeDanmakuOverlayWindow(danmakuWindow);
-
-        var screenWidth = System.Windows.SystemParameters.WorkArea.Width;
-        var screenHeight = System.Windows.SystemParameters.WorkArea.Height;
-        
-        // Base Font size is 36, Slider is percentage (50~300)
-        double fontSizePct = FontSizeSlider != null ? FontSizeSlider.Value : 100;
-        double fontSize = 36 * (fontSizePct / 100.0);
-        
-        double trackHeight = fontSize + 24; // + padding
-        
-        int totalTracks = (int)(screenHeight / trackHeight);
-        if (totalTracks > _tracks.Length) totalTracks = _tracks.Length;
-
-        // Display Area percentage
-        double dsAreaPct = DisplayAreaSlider != null ? DisplayAreaSlider.Value : 100.0;
-        int endTrack = (int)(totalTracks * (dsAreaPct / 100.0));
-        if (endTrack < 1) endTrack = 1;
-        if (endTrack > totalTracks) endTrack = totalTracks;
-        int startTrack = 0;
-        
-        int selectedTrack = -1;
-        System.Collections.Generic.List<int> availableTracks = new System.Collections.Generic.List<int>();
-        
-        // Define gap based on density
-        double minGap = 100;
-        if (DensityMore?.IsChecked == true) minGap = 20;
-        else if (DensityOverlap?.IsChecked == true) minGap = -300; // allow overlap
-
-        for (int i = startTrack; i < endTrack; i++)
-        {
-            var track = _tracks[i];
-            if (track == null || track.RightEdge < screenWidth - minGap)
-            {
-                availableTracks.Add(i);
-            }
-        }
-
-        double spawnX = screenWidth;
-
-        if (availableTracks.Count == 0)
-        {
-            selectedTrack = new Random().Next(startTrack, endTrack);
-            if (DensityNormal?.IsChecked == true)
-            {
-                // Push it to the right of the existing one to Strictly avoid overlap
-                var tk = _tracks[selectedTrack];
-                if (tk != null && tk.RightEdge > spawnX - minGap)
-                {
-                    spawnX = tk.RightEdge + minGap;
-                }
-            }
-        }
-        else
-        {
-            selectedTrack = availableTracks[new Random().Next(0, availableTracks.Count)];
-        }
-
-        int y = (int)(selectedTrack * trackHeight);
-
-        string selectedFontName = GetSelectedFontFamilyName();
-        System.Windows.Media.FontFamily fontFamily = string.IsNullOrWhiteSpace(selectedFontName)
-            ? new System.Windows.Media.FontFamily("Microsoft YaHei")
-            : new System.Windows.Media.FontFamily(selectedFontName);
-
-        var danmakuBrush = new System.Windows.Media.SolidColorBrush(ToWpfColor(DanmakuColor.Color));
-        double borderThickness = BorderToggle?.IsOn == true ? Math.Max(0, BorderThicknessSlider.Value) : 0;
-        System.Windows.Media.Brush? borderBrush = borderThickness > 0
-            ? new System.Windows.Media.SolidColorBrush(ToWpfColor(BorderColor.Color))
-            : null;
-
-        // Load Icon
-        System.Windows.Media.ImageSource? iconSource = null;
         if (item.AppLogoStream != null)
         {
             try
             {
                 using var stream = await item.AppLogoStream.OpenReadAsync();
-                var memStream = new System.IO.MemoryStream();
+                using var memStream = new MemoryStream();
                 using (var netStream = stream.AsStreamForRead())
                 {
                     await netStream.CopyToAsync(memStream);
                 }
-                memStream.Position = 0;
-                var bitmap = new System.Windows.Media.Imaging.BitmapImage();
-                bitmap.BeginInit();
-                bitmap.CacheOption = System.Windows.Media.Imaging.BitmapCacheOption.OnLoad;
-                bitmap.StreamSource = memStream;
-                bitmap.EndInit();
-                bitmap.Freeze();
-                iconSource = bitmap;
+                iconPng = memStream.ToArray();
             }
             catch { }
         }
 
-        var textBlock = new OutlinedTextElement
+        var settings = DanmakuStyleSettings.Load();
+        _renderer.ShowDanmaku(text, iconPng, settings, System.Windows.Forms.Screen.PrimaryScreen);
+    }
+
+    private static System.Windows.Forms.Screen? ResolveTargetScreen(int mode)
+    {
+        return mode switch
         {
-            Text = msg,
-            FontSize = fontSize,
-            FontFamily = fontFamily,
-            FontWeight = BoldToggle?.IsOn != false ? System.Windows.FontWeights.Bold : System.Windows.FontWeights.Normal,
-            Fill = danmakuBrush,
-            Stroke = borderBrush,
-            StrokeThickness = borderThickness,
-            VerticalAlignment = System.Windows.VerticalAlignment.Center,
-            SnapsToDevicePixels = false
+            0 => System.Windows.Forms.Screen.PrimaryScreen,
+            1 => null, // null = all screens
+            2 => System.Windows.Forms.Screen.FromPoint(System.Windows.Forms.Cursor.Position),
+            _ => System.Windows.Forms.Screen.PrimaryScreen
         };
-
-        var effect = ShadowToggle?.IsOn != false ? new System.Windows.Media.Effects.DropShadowEffect
-        {
-            Color = ToWpfColor(ShadowColor.Color),
-            BlurRadius = Math.Max(0, ShadowBlurSlider.Value),
-            ShadowDepth = Math.Max(0, ShadowDepthSlider.Value),
-            Opacity = Math.Clamp(ShadowOpacitySlider.Value / 100.0, 0, 1)
-        } : null;
-
-        var stackPanel = new System.Windows.Controls.StackPanel
-        {
-            Orientation = System.Windows.Controls.Orientation.Horizontal,
-            Margin = new System.Windows.Thickness(10),
-            Opacity = OpacitySlider != null ? OpacitySlider.Value / 100.0 : 1.0,
-            Effect = effect,
-            CacheMode = new System.Windows.Media.BitmapCache { EnableClearType = false, SnapsToDevicePixels = false }
-        };
-
-        if (iconSource != null)
-        {
-            stackPanel.Children.Add(new System.Windows.Controls.Image
-            {
-                Source = iconSource,
-                Width = fontSize,
-                Height = fontSize,
-                Margin = new System.Windows.Thickness(0, 0, 8, 0),
-                VerticalAlignment = System.Windows.VerticalAlignment.Center
-            });
-        }
-        
-        stackPanel.Children.Add(textBlock);
-
-        danmakuWindow.Left = spawnX;
-        danmakuWindow.Top = y;
-        danmakuWindow.Content = stackPanel;
-
-        double currentX = spawnX;
-        double speed = SpeedSlider != null ? SpeedSlider.Value : 6.0;
-
-        stackPanel.Measure(new System.Windows.Size(double.PositiveInfinity, double.PositiveInfinity));
-        double targetX = -stackPanel.DesiredSize.Width - 50;
-
-        _tracks[selectedTrack] = new TrackInfo { Window = danmakuWindow, Element = stackPanel };
-
-        danmakuWindow.Show();
-
-        // 再次确认 overlay 样式，防止 WPF 在 Show 过程中覆盖扩展样式。
-        ApplyDanmakuWindowExtendedStyles(danmakuWindow);
-        var hwnd = new System.Windows.Interop.WindowInteropHelper(danmakuWindow).Handle;
-
-        // 针对具体的弹幕窗口，进一步确保 CompositionTarget 采用硬件渲染
-        var hwndSource = System.Windows.Interop.HwndSource.FromHwnd(hwnd);
-        if (hwndSource != null && hwndSource.CompositionTarget != null)
-        {
-            hwndSource.CompositionTarget.RenderMode = System.Windows.Interop.RenderMode.Default;
-        }
-
-        // Animate the top-level transparent window based on monitor frame deltas.
-        long lastTime = 0;
-        EventHandler? renderingHandler = null;
-        renderingHandler = (s, e) =>
-        {
-            var args = (System.Windows.Media.RenderingEventArgs)e;
-            if (lastTime == 0)
-            {
-                lastTime = args.RenderingTime.Ticks;
-                return;
-            }
-
-            double dtFrames = (args.RenderingTime.Ticks - lastTime) / 166666.666;
-            lastTime = args.RenderingTime.Ticks;
-
-            currentX -= speed * dtFrames;
-
-            if (currentX <= targetX)
-            {
-                if (renderingHandler != null)
-                {
-                    System.Windows.Media.CompositionTarget.Rendering -= renderingHandler;
-                }
-
-                danmakuWindow.Close();
-                if (_tracks[selectedTrack]?.Window == danmakuWindow)
-                {
-                    _tracks[selectedTrack] = null;
-                }
-            }
-            else
-            {
-                danmakuWindow.Left = currentX;
-            }
-        };
-
-        System.Windows.Media.CompositionTarget.Rendering += renderingHandler;
     }
 }

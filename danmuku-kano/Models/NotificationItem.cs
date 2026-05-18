@@ -1,4 +1,6 @@
 using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace damuku_kano.Models;
 
@@ -26,15 +28,23 @@ public class NotificationItem : System.ComponentModel.INotifyPropertyChanged
         }
     }
 
+    private bool _isLoadingImage;
+
     private async void LoadImageAsync()
     {
+        if (_isLoadingImage) return;
+        _isLoadingImage = true;
         try
         {
-            var stream = await AppLogoStream!.OpenReadAsync();
-            await _appIconSource!.SetSourceAsync(stream);
+            if (AppLogoStream == null || _appIconSource == null) return;
+            var stream = await AppLogoStream.OpenReadAsync();
+            await _appIconSource.SetSourceAsync(stream);
             OnPropertyChanged(nameof(AppIconSource));
         }
-        catch { }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Failed to load app icon: {ex.Message}");
+        }
     }
 
     public event System.ComponentModel.PropertyChangedEventHandler? PropertyChanged;

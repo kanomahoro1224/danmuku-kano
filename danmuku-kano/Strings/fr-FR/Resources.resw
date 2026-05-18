@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppTitle" xml:space="preserve"><value>Kano Notification Danmaku</value></data>
+  <data name="NavStyle" xml:space="preserve"><value>Style des danmakus</value></data>
+  <data name="NavHistory" xml:space="preserve"><value>Historique des notifications</value></data>
+  <data name="TextProjectBasedOn" xml:space="preserve"><value>Ce projet est basé sur Windows App SDK (WinUI 3).</value></data>
+  <data name="TextNoNativeTransparency" xml:space="preserve"><value>WinUI 3 ne prend pas encore en charge nativement les fenêtres transparentes sans bordure,</value></data>
+  <data name="TextComplexHooks" xml:space="preserve"><value>le rendu des danmakus est géré par une couche WPF transparente dédiée, qui continue de fonctionner même après la fermeture de la fenêtre principale.</value></data>
+  <data name="TextFontSize" xml:space="preserve"><value>Taille de police (%)</value></data>
+  <data name="TextSpeed" xml:space="preserve"><value>Vitesse des danmakus</value></data>
+  <data name="TextOpacity" xml:space="preserve"><value>Opacité (%)</value></data>
+  <data name="TextDisplayArea" xml:space="preserve"><value>Zone d'affichage (%)</value></data>
+  <data name="TextDensity" xml:space="preserve"><value>Densité des danmakus</value></data>
+  <data name="TextDensityNormal" xml:space="preserve"><value>Normal</value></data>
+  <data name="TextDensityMore" xml:space="preserve"><value>Plus dense</value></data>
+  <data name="TextDensityOverlap" xml:space="preserve"><value>Chevauchement</value></data>
+  <data name="TextDisplayScreen" xml:space="preserve"><value>Écran d'affichage</value></data>
+  <data name="TextScreenPrimary" xml:space="preserve"><value>Écran principal uniquement</value></data>
+  <data name="TextScreenAll" xml:space="preserve"><value>Tous les écrans</value></data>
+  <data name="TextScreenMouse" xml:space="preserve"><value>Écran du curseur</value></data>
+  <data name="TextFontAndColor" xml:space="preserve"><value>Couleur et police</value></data>
+  <data name="TextDefaultFont" xml:space="preserve"><value>Police par défaut</value></data>
+  <data name="TextDanmakuColorConfig" xml:space="preserve"><value>Couleur des danmakus</value></data>
+  <data name="TextBold" xml:space="preserve"><value>Texte en gras</value></data>
+  <data name="TextBorder" xml:space="preserve"><value>Contour du texte</value></data>
+  <data name="TextBorderColorConfig" xml:space="preserve"><value>Couleur du contour</value></data>
+  <data name="TextBorderThickness" xml:space="preserve"><value>Épaisseur du contour</value></data>
+  <data name="TextShadow" xml:space="preserve"><value>Effet lueur/ombre</value></data>
+  <data name="TextShadowColorConfig" xml:space="preserve"><value>Couleur de l'ombre</value></data>
+  <data name="TextShadowBlur" xml:space="preserve"><value>Flou de l'ombre</value></data>
+  <data name="TextShadowDepth" xml:space="preserve"><value>Décalage de l'ombre</value></data>
+  <data name="TextShadowOpacity" xml:space="preserve"><value>Opacité de l'ombre (%)</value></data>
+  <data name="TextTestDanmaku" xml:space="preserve"><value>Envoyer un danmaku de test (débogage)</value></data>
+  <data name="TextSystemSettings" xml:space="preserve"><value>Paramètres système</value></data>
+  <data name="TextLanguage" xml:space="preserve"><value>Langue de l'interface</value></data>
+  <data name="TextLanguageHans" xml:space="preserve"><value>简体中文</value></data>
+  <data name="TextLanguageHant" xml:space="preserve"><value>繁體中文</value></data>
+  <data name="TextLanguageEn" xml:space="preserve"><value>English</value></data>
+  <data name="TextLanguageJa" xml:space="preserve"><value>日本語</value></data>
+  <data name="TextLanguageKo" xml:space="preserve"><value>한국어</value></data>
+  <data name="TextLanguageFr" xml:space="preserve"><value>Français</value></data>
+  <data name="TextLanguageDe" xml:space="preserve"><value>Deutsch</value></data>
+  <data name="TextLanguageEs" xml:space="preserve"><value>Español</value></data>
+  <data name="TextLanguagePtBr" xml:space="preserve"><value>Português (Brasil)</value></data>
+  <data name="TextLanguageRu" xml:space="preserve"><value>Русский</value></data>
+  <data name="TextLanguageIt" xml:space="preserve"><value>Italiano</value></data>
+  <data name="TextLanguageTr" xml:space="preserve"><value>Türkçe</value></data>
+  <data name="TextCloseAction" xml:space="preserve"><value>Lors de la fermeture de la fenêtre principale :</value></data>
+  <data name="TextMinimizeToTray" xml:space="preserve"><value>Réduire dans la barre des tâches</value></data>
+  <data name="TextExitApp" xml:space="preserve"><value>Quitter l'application</value></data>
+  <data name="TextClosePrompt" xml:space="preserve"><value>Demander confirmation à la fermeture</value></data>
+  <data name="TextAutoStart" xml:space="preserve"><value>Démarrer automatiquement avec Windows</value></data>
+  <data name="TrayAppShow" xml:space="preserve"><value>Afficher la fenêtre principale</value></data>
+  <data name="TrayAppExit" xml:space="preserve"><value>Quitter complètement</value></data>
+  <data name="DialogTitle" xml:space="preserve"><value>Information</value></data>
+  <data name="DialogConfirmMin" xml:space="preserve"><value>Voulez-vous réduire dans la barre des tâches ?</value></data>
+  <data name="DialogConfirmExit" xml:space="preserve"><value>Voulez-vous quitter l'application ?</value></data>
+  <data name="DialogConfirm" xml:space="preserve"><value>OK</value></data>
+  <data name="DialogCancel" xml:space="preserve"><value>Annuler</value></data>
+  <data name="NotificationFallbackAppName" xml:space="preserve"><value>Notification système</value></data>
+  <data name="TestNotificationAppName" xml:space="preserve"><value>Kano Notification Danmaku</value></data>
+  <data name="TestNotificationTitle" xml:space="preserve"><value>Notification de test</value></data>
+  <data name="TestNotificationMessagePrefix" xml:space="preserve"><value>Danmaku de test</value></data>
+  <data name="StartupDisabledByUserMessage" xml:space="preserve"><value>Windows a désactivé le démarrage automatique de cette application. Veuillez l'activer manuellement dans Paramètres Windows &gt; Applications &gt; Démarrage, ou dans Gestionnaire des tâches &gt; Applications de démarrage.</value></data>
+  <data name="StartupDisabledByPolicyMessage" xml:space="preserve"><value>La stratégie Windows interdit actuellement le démarrage automatique de cette application. Veuillez vérifier les paramètres d'administrateur ou de stratégie de groupe.</value></data>
+  <data name="StartupEnabledByPolicyMessage" xml:space="preserve"><value>La stratégie Windows force actuellement le démarrage automatique de cette application. Il n'est pas possible de le désactiver depuis l'application.</value></data>
+  <data name="StartupTaskUnavailableMessage" xml:space="preserve"><value>Impossible de lire ou modifier la tâche de démarrage Windows. Veuillez vérifier que vous exécutez la version MSIX.</value></data>
+  <data name="NavAbout" xml:space="preserve"><value>À propos</value></data>
+  <data name="AboutProductName" xml:space="preserve"><value>Kano Notification Danmaku</value></data>
+  <data name="AboutVersionTemplate" xml:space="preserve"><value>{0}-release ({1})</value></data>
+  <data name="AboutArchitecture64" xml:space="preserve"><value>64 bits</value></data>
+  <data name="AboutArchitecture32" xml:space="preserve"><value>32 bits</value></data>
+  <data name="AboutMadeByPrefix" xml:space="preserve"><value>Fait par 鹿可可 avec</value></data>
+  <data name="AboutMadeBySuffix" xml:space="preserve"><value></value></data>
+</root>

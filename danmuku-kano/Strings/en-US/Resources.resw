@@ -26,6 +26,10 @@
   <data name="TextDensityNormal" xml:space="preserve"><value>Normal</value></data>
   <data name="TextDensityMore" xml:space="preserve"><value>More</value></data>
   <data name="TextDensityOverlap" xml:space="preserve"><value>Overlap</value></data>
+  <data name="TextDisplayScreen" xml:space="preserve"><value>Display Screen</value></data>
+  <data name="TextScreenPrimary" xml:space="preserve"><value>Primary Only</value></data>
+  <data name="TextScreenAll" xml:space="preserve"><value>All Screens</value></data>
+  <data name="TextScreenMouse" xml:space="preserve"><value>Mouse Screen</value></data>
   <data name="TextFontAndColor" xml:space="preserve"><value>Color and Font</value></data>
   <data name="TextDefaultFont" xml:space="preserve"><value>Default Font</value></data>
   <data name="TextDanmakuColorConfig" xml:space="preserve"><value>Color Settings</value></data>
@@ -45,6 +49,14 @@
   <data name="TextLanguageHant" xml:space="preserve"><value>Traditional Chinese</value></data>
   <data name="TextLanguageEn" xml:space="preserve"><value>English</value></data>
   <data name="TextLanguageJa" xml:space="preserve"><value>Japanese</value></data>
+  <data name="TextLanguageKo" xml:space="preserve"><value>Korean</value></data>
+  <data name="TextLanguageFr" xml:space="preserve"><value>French</value></data>
+  <data name="TextLanguageDe" xml:space="preserve"><value>German</value></data>
+  <data name="TextLanguageEs" xml:space="preserve"><value>Spanish</value></data>
+  <data name="TextLanguagePtBr" xml:space="preserve"><value>Portuguese (Brazil)</value></data>
+  <data name="TextLanguageRu" xml:space="preserve"><value>Russian</value></data>
+  <data name="TextLanguageIt" xml:space="preserve"><value>Italian</value></data>
+  <data name="TextLanguageTr" xml:space="preserve"><value>Turkish</value></data>
   <data name="TextCloseAction" xml:space="preserve"><value>When closing the main window:</value></data>
   <data name="TextMinimizeToTray" xml:space="preserve"><value>Close to tray</value></data>
   <data name="TextExitApp" xml:space="preserve"><value>Exit application</value></data>

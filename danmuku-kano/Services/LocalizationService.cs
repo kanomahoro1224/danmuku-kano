@@ -27,6 +27,10 @@ public sealed class LocalizationService : INotifyPropertyChanged
     public string TextDensityNormal => GetString(nameof(TextDensityNormal));
     public string TextDensityMore => GetString(nameof(TextDensityMore));
     public string TextDensityOverlap => GetString(nameof(TextDensityOverlap));
+    public string TextDisplayScreen => GetString(nameof(TextDisplayScreen));
+    public string TextScreenPrimary => GetString(nameof(TextScreenPrimary));
+    public string TextScreenAll => GetString(nameof(TextScreenAll));
+    public string TextScreenMouse => GetString(nameof(TextScreenMouse));
     public string TextFontAndColor => GetString(nameof(TextFontAndColor));
     public string TextDefaultFont => GetString(nameof(TextDefaultFont));
     public string TextDanmakuColorConfig => GetString(nameof(TextDanmakuColorConfig));
@@ -46,6 +50,14 @@ public sealed class LocalizationService : INotifyPropertyChanged
     public string TextLanguageHant => GetString(nameof(TextLanguageHant));
     public string TextLanguageEn => GetString(nameof(TextLanguageEn));
     public string TextLanguageJa => GetString(nameof(TextLanguageJa));
+    public string TextLanguageKo => GetString(nameof(TextLanguageKo));
+    public string TextLanguageFr => GetString(nameof(TextLanguageFr));
+    public string TextLanguageDe => GetString(nameof(TextLanguageDe));
+    public string TextLanguageEs => GetString(nameof(TextLanguageEs));
+    public string TextLanguagePtBr => GetString(nameof(TextLanguagePtBr));
+    public string TextLanguageRu => GetString(nameof(TextLanguageRu));
+    public string TextLanguageIt => GetString(nameof(TextLanguageIt));
+    public string TextLanguageTr => GetString(nameof(TextLanguageTr));
     public string TextCloseAction => GetString(nameof(TextCloseAction));
     public string TextMinimizeToTray => GetString(nameof(TextMinimizeToTray));
     public string TextExitApp => GetString(nameof(TextExitApp));
@@ -75,12 +87,62 @@ public sealed class LocalizationService : INotifyPropertyChanged
 
     public static int NormalizeLanguageIndex(int languageIndex)
     {
-        return languageIndex is >= 0 and <= 3 ? languageIndex : 0;
+        return languageIndex is >= 0 and <= 11 ? languageIndex : 0;
     }
 
     public void ApplySavedLanguage()
     {
-        ApplyLanguage(SettingsService.Get<int>("Language", 0));
+        if (SettingsService.ContainsKey("Language"))
+        {
+            ApplyLanguage(SettingsService.Get<int>("Language", 0));
+        }
+        else
+        {
+            int detected = DetectSystemLanguage();
+            SettingsService.Set("Language", detected);
+            ApplyLanguage(detected);
+        }
+    }
+
+    private static int DetectSystemLanguage()
+    {
+        try
+        {
+            var languages = Windows.Globalization.ApplicationLanguages.Languages;
+            foreach (var lang in languages)
+            {
+                var lower = lang.ToLowerInvariant();
+                if (lower.StartsWith("zh"))
+                {
+                    if (lower.Contains("tw") || lower.Contains("hk") || lower.Contains("mo")
+                        || lower.Contains("hant"))
+                        return 1;
+                    return 0;
+                }
+                if (lower.StartsWith("ja"))
+                    return 3;
+                if (lower.StartsWith("en"))
+                    return 2;
+                if (lower.StartsWith("ko"))
+                    return 4;
+                if (lower.StartsWith("fr"))
+                    return 5;
+                if (lower.StartsWith("de"))
+                    return 6;
+                if (lower.StartsWith("es"))
+                    return 7;
+                if (lower.StartsWith("pt"))
+                    return 8;
+                if (lower.StartsWith("ru"))
+                    return 9;
+                if (lower.StartsWith("it"))
+                    return 10;
+                if (lower.StartsWith("tr"))
+                    return 11;
+            }
+        }
+        catch { }
+        return 0;
     }
 
     public void ApplyLanguage(int languageIndex)
@@ -94,6 +156,14 @@ public sealed class LocalizationService : INotifyPropertyChanged
                 1 => "zh-Hant",
                 2 => "en-US",
                 3 => "ja-JP",
+                4 => "ko-KR",
+                5 => "fr-FR",
+                6 => "de-DE",
+                7 => "es-ES",
+                8 => "pt-BR",
+                9 => "ru-RU",
+                10 => "it-IT",
+                11 => "tr-TR",
                 _ => "zh-Hans"
             };
         }

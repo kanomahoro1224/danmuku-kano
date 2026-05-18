@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppTitle" xml:space="preserve"><value>Kano Danmaku-Benachrichtigung</value></data>
+  <data name="NavStyle" xml:space="preserve"><value>Danmaku-Stil</value></data>
+  <data name="NavHistory" xml:space="preserve"><value>Benachrichtigungsverlauf</value></data>
+  <data name="TextProjectBasedOn" xml:space="preserve"><value>Dieses Projekt basiert auf Windows App SDK (WinUI 3).</value></data>
+  <data name="TextNoNativeTransparency" xml:space="preserve"><value>WinUI 3 unterstützt derzeit keine transparenten randlosen Fenster nativ,</value></data>
+  <data name="TextComplexHooks" xml:space="preserve"><value>die Danmaku-Darstellung wird von einem separaten WPF-Transparenz-Host-Layer übernommen, der auch nach Schließen des Hauptfensters weiterläuft.</value></data>
+  <data name="TextFontSize" xml:space="preserve"><value>Schriftgröße (%)</value></data>
+  <data name="TextSpeed" xml:space="preserve"><value>Danmaku-Geschwindigkeit</value></data>
+  <data name="TextOpacity" xml:space="preserve"><value>Deckkraft (%)</value></data>
+  <data name="TextDisplayArea" xml:space="preserve"><value>Anzeigebereich (%)</value></data>
+  <data name="TextDensity" xml:space="preserve"><value>Danmaku-Dichte</value></data>
+  <data name="TextDensityNormal" xml:space="preserve"><value>Normal</value></data>
+  <data name="TextDensityMore" xml:space="preserve"><value>Dichter</value></data>
+  <data name="TextDensityOverlap" xml:space="preserve"><value>Überlappung</value></data>
+  <data name="TextDisplayScreen" xml:space="preserve"><value>Anzeigebildschirm</value></data>
+  <data name="TextScreenPrimary" xml:space="preserve"><value>Nur Hauptbildschirm</value></data>
+  <data name="TextScreenAll" xml:space="preserve"><value>Alle Bildschirme</value></data>
+  <data name="TextScreenMouse" xml:space="preserve"><value>Bildschirm mit Mauszeiger</value></data>
+  <data name="TextFontAndColor" xml:space="preserve"><value>Farbe und Schrift</value></data>
+  <data name="TextDefaultFont" xml:space="preserve"><value>Standardschrift</value></data>
+  <data name="TextDanmakuColorConfig" xml:space="preserve"><value>Danmaku-Farbe</value></data>
+  <data name="TextBold" xml:space="preserve"><value>Fett</value></data>
+  <data name="TextBorder" xml:space="preserve"><value>Textkontur</value></data>
+  <data name="TextBorderColorConfig" xml:space="preserve"><value>Konturfarbe</value></data>
+  <data name="TextBorderThickness" xml:space="preserve"><value>Konturstärke</value></data>
+  <data name="TextShadow" xml:space="preserve"><value>Glow/Schatteneffekt</value></data>
+  <data name="TextShadowColorConfig" xml:space="preserve"><value>Schattenfarbe</value></data>
+  <data name="TextShadowBlur" xml:space="preserve"><value>Schattenunschärfe</value></data>
+  <data name="TextShadowDepth" xml:space="preserve"><value>Schattenversatz</value></data>
+  <data name="TextShadowOpacity" xml:space="preserve"><value>Schatten-Deckkraft (%)</value></data>
+  <data name="TextTestDanmaku" xml:space="preserve"><value>Test-Benachrichtigung senden (Debug)</value></data>
+  <data name="TextSystemSettings" xml:space="preserve"><value>Systemeinstellungen</value></data>
+  <data name="TextLanguage" xml:space="preserve"><value>Oberflächensprache</value></data>
+  <data name="TextLanguageHans" xml:space="preserve"><value>简体中文</value></data>
+  <data name="TextLanguageHant" xml:space="preserve"><value>繁體中文</value></data>
+  <data name="TextLanguageEn" xml:space="preserve"><value>English</value></data>
+  <data name="TextLanguageJa" xml:space="preserve"><value>日本語</value></data>
+  <data name="TextLanguageKo" xml:space="preserve"><value>한국어</value></data>
+  <data name="TextLanguageFr" xml:space="preserve"><value>Français</value></data>
+  <data name="TextLanguageDe" xml:space="preserve"><value>Deutsch</value></data>
+  <data name="TextLanguageEs" xml:space="preserve"><value>Español</value></data>
+  <data name="TextLanguagePtBr" xml:space="preserve"><value>Português (Brasil)</value></data>
+  <data name="TextLanguageRu" xml:space="preserve"><value>Русский</value></data>
+  <data name="TextLanguageIt" xml:space="preserve"><value>Italiano</value></data>
+  <data name="TextLanguageTr" xml:space="preserve"><value>Türkçe</value></data>
+  <data name="TextCloseAction" xml:space="preserve"><value>Beim Schließen des Hauptfensters:</value></data>
+  <data name="TextMinimizeToTray" xml:space="preserve"><value>In den Infobereich minimieren</value></data>
+  <data name="TextExitApp" xml:space="preserve"><value>App beenden</value></data>
+  <data name="TextClosePrompt" xml:space="preserve"><value>Beim Schließen nachfragen</value></data>
+  <data name="TextAutoStart" xml:space="preserve"><value>Automatisch mit Windows starten</value></data>
+  <data name="TrayAppShow" xml:space="preserve"><value>Hauptfenster anzeigen</value></data>
+  <data name="TrayAppExit" xml:space="preserve"><value>Vollständig beenden</value></data>
+  <data name="DialogTitle" xml:space="preserve"><value>Hinweis</value></data>
+  <data name="DialogConfirmMin" xml:space="preserve"><value>Möchten Sie in den Infobereich minimieren?</value></data>
+  <data name="DialogConfirmExit" xml:space="preserve"><value>Möchten Sie die App beenden?</value></data>
+  <data name="DialogConfirm" xml:space="preserve"><value>OK</value></data>
+  <data name="DialogCancel" xml:space="preserve"><value>Abbrechen</value></data>
+  <data name="NotificationFallbackAppName" xml:space="preserve"><value>Systembenachrichtigung</value></data>
+  <data name="TestNotificationAppName" xml:space="preserve"><value>Kano Danmaku-Benachrichtigung</value></data>
+  <data name="TestNotificationTitle" xml:space="preserve"><value>Testbenachrichtigung</value></data>
+  <data name="TestNotificationMessagePrefix" xml:space="preserve"><value>Test-Danmaku</value></data>
+  <data name="StartupDisabledByUserMessage" xml:space="preserve"><value>Windows hat den Autostart dieser App deaktiviert. Bitte aktivieren Sie Kano manuell in Windows-Einstellungen &gt; Apps &gt; Autostart oder im Task-Manager &gt; Autostart-Apps.</value></data>
+  <data name="StartupDisabledByPolicyMessage" xml:space="preserve"><value>Die Windows-Richtlinie verbietet derzeit den Autostart dieser App. Bitte überprüfen Sie die Administrator- oder Gruppenrichtlinieneinstellungen.</value></data>
+  <data name="StartupEnabledByPolicyMessage" xml:space="preserve"><value>Die Windows-Richtlinie erzwingt derzeit den Autostart dieser App. Er kann nicht innerhalb der App deaktiviert werden.</value></data>
+  <data name="StartupTaskUnavailableMessage" xml:space="preserve"><value>Die Windows-Autostart-Aufgabe konnte nicht gelesen oder geändert werden. Bitte stellen Sie sicher, dass Sie die MSIX-Version ausführen.</value></data>
+  <data name="NavAbout" xml:space="preserve"><value>Über</value></data>
+  <data name="AboutProductName" xml:space="preserve"><value>Kano Danmaku-Benachrichtigung</value></data>
+  <data name="AboutVersionTemplate" xml:space="preserve"><value>{0}-release ({1})</value></data>
+  <data name="AboutArchitecture64" xml:space="preserve"><value>64-Bit</value></data>
+  <data name="AboutArchitecture32" xml:space="preserve"><value>32-Bit</value></data>
+  <data name="AboutMadeByPrefix" xml:space="preserve"><value>Gemacht von 鹿可可 mit</value></data>
+  <data name="AboutMadeBySuffix" xml:space="preserve"><value></value></data>
+</root>

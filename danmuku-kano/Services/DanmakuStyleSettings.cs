@@ -11,22 +11,21 @@ public sealed class DanmakuStyleSettings
     public double OpacityPercent { get; init; }
     public double DisplayAreaPercent { get; init; }
     public int Density { get; init; }
-    public int FontFamilyIndex { get; init; }
+    public string FontFamilyName { get; init; } = "Microsoft YaHei";
     public bool Bold { get; init; }
     public bool Shadow { get; init; }
     public Color Color { get; init; }
+    public double BorderThickness { get; init; }
+    public Color BorderColor { get; init; }
+    public double ShadowBlur { get; init; }
+    public double ShadowDepth { get; init; }
+    public double ShadowOpacity { get; init; }
+    public Color ShadowColor { get; init; }
+    public int DisplayScreenMode { get; init; }
 
     public double FontSize => 36 * (FontSizePercent / 100.0);
 
     public double PixelsPerSecond => Math.Max(1, Speed) * 60.0;
-
-    public string FontFamilyName => FontFamilyIndex switch
-    {
-        1 => "Microsoft YaHei",
-        2 => "SimHei",
-        3 => "KaiTi",
-        _ => "Microsoft YaHei"
-    };
 
     public static DanmakuStyleSettings Load()
     {
@@ -37,11 +36,25 @@ public sealed class DanmakuStyleSettings
             OpacityPercent = SettingsService.Get<double>("Opacity", 100),
             DisplayAreaPercent = SettingsService.Get<double>("DisplayArea", 100),
             Density = SettingsService.Get<int>("Density", 0),
-            FontFamilyIndex = SettingsService.Get<int>("FontFamily", 0),
+            FontFamilyName = ResolveFontFamilyName(SettingsService.Get<string>("FontFamilyName")),
             Bold = SettingsService.Get<bool>("Bold", true),
             Shadow = SettingsService.Get<bool>("Shadow", true),
-            Color = ParseColor(SettingsService.Get<string>("DanmakuColor"))
+            Color = ParseColor(SettingsService.Get<string>("DanmakuColor")),
+            BorderThickness = SettingsService.Get<bool>("Border", false)
+                ? Math.Max(0, SettingsService.Get<double>("BorderThickness", 2))
+                : 0,
+            BorderColor = ParseColor(SettingsService.Get<string>("BorderColor")),
+            ShadowBlur = Math.Max(0, SettingsService.Get<double>("ShadowBlur", 4)),
+            ShadowDepth = Math.Max(0, SettingsService.Get<double>("ShadowDepth", 2)),
+            ShadowOpacity = Math.Clamp(SettingsService.Get<double>("ShadowOpacity", 100) / 100.0, 0, 1),
+            ShadowColor = ParseColor(SettingsService.Get<string>("ShadowColor")),
+            DisplayScreenMode = SettingsService.Get<int>("DisplayScreenMode", 0)
         };
+    }
+
+    private static string ResolveFontFamilyName(string? name)
+    {
+        return string.IsNullOrWhiteSpace(name) ? "Microsoft YaHei" : name;
     }
 
     private static Color ParseColor(string? text)

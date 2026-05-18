@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppTitle" xml:space="preserve"><value>Kano Danmaku Bildirimi</value></data>
+  <data name="NavStyle" xml:space="preserve"><value>Danmaku stili</value></data>
+  <data name="NavHistory" xml:space="preserve"><value>Bildirim geçmişi</value></data>
+  <data name="TextProjectBasedOn" xml:space="preserve"><value>Bu proje Windows App SDK (WinUI 3) üzerine kuruludur.</value></data>
+  <data name="TextNoNativeTransparency" xml:space="preserve"><value>WinUI 3 şu anda şeffaf kenarlığı pencereleri yerel olarak desteklemiyor,</value></data>
+  <data name="TextComplexHooks" xml:space="preserve"><value>danmaku işleme, ana pencere kapatıldıktan sonra bile çalışmaya devam eden özel bir WPF şeffaf katmanı tarafından yönetilir.</value></data>
+  <data name="TextFontSize" xml:space="preserve"><value>Yazı tipi boyutu (%)</value></data>
+  <data name="TextSpeed" xml:space="preserve"><value>Danmaku hızı</value></data>
+  <data name="TextOpacity" xml:space="preserve"><value>Opaklık (%)</value></data>
+  <data name="TextDisplayArea" xml:space="preserve"><value>Görüntüleme alanı (%)</value></data>
+  <data name="TextDensity" xml:space="preserve"><value>Danmaku yoğunluğu</value></data>
+  <data name="TextDensityNormal" xml:space="preserve"><value>Normal</value></data>
+  <data name="TextDensityMore" xml:space="preserve"><value>Daha yoğun</value></data>
+  <data name="TextDensityOverlap" xml:space="preserve"><value>Üst üste binme</value></data>
+  <data name="TextDisplayScreen" xml:space="preserve"><value>Görüntüleme ekranı</value></data>
+  <data name="TextScreenPrimary" xml:space="preserve"><value>Sadece birincil ekran</value></data>
+  <data name="TextScreenAll" xml:space="preserve"><value>Tüm ekranlar</value></data>
+  <data name="TextScreenMouse" xml:space="preserve"><value>Fare imleci ekranı</value></data>
+  <data name="TextFontAndColor" xml:space="preserve"><value>Renk ve yazı tipi</value></data>
+  <data name="TextDefaultFont" xml:space="preserve"><value>Varsayılan yazı tipi</value></data>
+  <data name="TextDanmakuColorConfig" xml:space="preserve"><value>Danmaku rengi</value></data>
+  <data name="TextBold" xml:space="preserve"><value>Kalın</value></data>
+  <data name="TextBorder" xml:space="preserve"><value>Metin kenarlığı</value></data>
+  <data name="TextBorderColorConfig" xml:space="preserve"><value>Kenarlık rengi</value></data>
+  <data name="TextBorderThickness" xml:space="preserve"><value>Kenarlık kalınlığı</value></data>
+  <data name="TextShadow" xml:space="preserve"><value>Parıltı/gölge efekti</value></data>
+  <data name="TextShadowColorConfig" xml:space="preserve"><value>Gölge rengi</value></data>
+  <data name="TextShadowBlur" xml:space="preserve"><value>Gölge bulanıklığı</value></data>
+  <data name="TextShadowDepth" xml:space="preserve"><value>Gölge kayması</value></data>
+  <data name="TextShadowOpacity" xml:space="preserve"><value>Gölge opaklığı (%)</value></data>
+  <data name="TextTestDanmaku" xml:space="preserve"><value>Test bildirimi gönder (hata ayıklama)</value></data>
+  <data name="TextSystemSettings" xml:space="preserve"><value>Sistem ayarları</value></data>
+  <data name="TextLanguage" xml:space="preserve"><value>Arayüz dili</value></data>
+  <data name="TextLanguageHans" xml:space="preserve"><value>简体中文</value></data>
+  <data name="TextLanguageHant" xml:space="preserve"><value>繁體中文</value></data>
+  <data name="TextLanguageEn" xml:space="preserve"><value>English</value></data>
+  <data name="TextLanguageJa" xml:space="preserve"><value>日本語</value></data>
+  <data name="TextLanguageKo" xml:space="preserve"><value>한국어</value></data>
+  <data name="TextLanguageFr" xml:space="preserve"><value>Français</value></data>
+  <data name="TextLanguageDe" xml:space="preserve"><value>Deutsch</value></data>
+  <data name="TextLanguageEs" xml:space="preserve"><value>Español</value></data>
+  <data name="TextLanguagePtBr" xml:space="preserve"><value>Português (Brasil)</value></data>
+  <data name="TextLanguageRu" xml:space="preserve"><value>Русский</value></data>
+  <data name="TextLanguageIt" xml:space="preserve"><value>Italiano</value></data>
+  <data name="TextLanguageTr" xml:space="preserve"><value>Türkçe</value></data>
+  <data name="TextCloseAction" xml:space="preserve"><value>Ana pencere kapatıldığında:</value></data>
+  <data name="TextMinimizeToTray" xml:space="preserve"><value>Sistem tepsisine küçült</value></data>
+  <data name="TextExitApp" xml:space="preserve"><value>Uygulamadan çık</value></data>
+  <data name="TextClosePrompt" xml:space="preserve"><value>Kapatırken onay iste</value></data>
+  <data name="TextAutoStart" xml:space="preserve"><value>Windows ile otomatik başlat</value></data>
+  <data name="TrayAppShow" xml:space="preserve"><value>Ana pencereyi göster</value></data>
+  <data name="TrayAppExit" xml:space="preserve"><value>Tamamen çık</value></data>
+  <data name="DialogTitle" xml:space="preserve"><value>Bilgi</value></data>
+  <data name="DialogConfirmMin" xml:space="preserve"><value>Sistem tepsisine küçültmek istiyor musunuz?</value></data>
+  <data name="DialogConfirmExit" xml:space="preserve"><value>Uygulamadan çıkmak istiyor musunuz?</value></data>
+  <data name="DialogConfirm" xml:space="preserve"><value>Tamam</value></data>
+  <data name="DialogCancel" xml:space="preserve"><value>İptal</value></data>
+  <data name="NotificationFallbackAppName" xml:space="preserve"><value>Sistem bildirimi</value></data>
+  <data name="TestNotificationAppName" xml:space="preserve"><value>Kano Danmaku Bildirimi</value></data>
+  <data name="TestNotificationTitle" xml:space="preserve"><value>Test bildirimi</value></data>
+  <data name="TestNotificationMessagePrefix" xml:space="preserve"><value>Test danmaku</value></data>
+  <data name="StartupDisabledByUserMessage" xml:space="preserve"><value>Windows bu uygulamanın otomatik başlatılmasını kullanıcı tarafından devre dışı bıraktı. Lütfen Kano'yu Windows Ayarları &gt; Uygulamalar &gt; Başlangıç veya Görev Yöneticisi &gt; Başlangıç uygulamaları bölümünden manuel olarak etkinleştirin.</value></data>
+  <data name="StartupDisabledByPolicyMessage" xml:space="preserve"><value>Windows ilkesi şu anda bu uygulamanın otomatik olarak başlatılmasını engelliyor. Yönetici veya grup ilkesi ayarlarını kontrol edin.</value></data>
+  <data name="StartupEnabledByPolicyMessage" xml:space="preserve"><value>Windows ilkesi şu anda bu uygulamanın otomatik olarak başlatılmasını zorunlu kılıyor. Uygulama içinden kapatılamaz.</value></data>
+  <data name="StartupTaskUnavailableMessage" xml:space="preserve"><value>Windows başlangıç görevi okunamıyor veya değiştirilemiyor. Lütfen MSIX paket sürümünü çalıştırdığınızdan emin olun.</value></data>
+  <data name="NavAbout" xml:space="preserve"><value>Hakkında</value></data>
+  <data name="AboutProductName" xml:space="preserve"><value>Kano Danmaku Bildirimi</value></data>
+  <data name="AboutVersionTemplate" xml:space="preserve"><value>{0}-release ({1})</value></data>
+  <data name="AboutArchitecture64" xml:space="preserve"><value>64-bit</value></data>
+  <data name="AboutArchitecture32" xml:space="preserve"><value>32-bit</value></data>
+  <data name="AboutMadeByPrefix" xml:space="preserve"><value>鹿可可 tarafından</value></data>
+  <data name="AboutMadeBySuffix" xml:space="preserve"><value>ile yapıldı</value></data>
+</root>

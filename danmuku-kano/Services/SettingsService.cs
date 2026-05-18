@@ -54,10 +54,16 @@ public static class SettingsService
         var dict = Load();
         // 先序列化再反序列化为 JsonElement，保证类型一致
         var raw = JsonSerializer.SerializeToUtf8Bytes(value);
-        dict[key] = JsonDocument.Parse(raw).RootElement.Clone();
+        using var doc = JsonDocument.Parse(raw);
+        dict[key] = doc.RootElement.Clone();
 
         _debounceTimer?.Dispose();
         _debounceTimer = new System.Threading.Timer(_ => Flush(), null, 300, System.Threading.Timeout.Infinite);
+    }
+
+    public static bool ContainsKey(string key)
+    {
+        return Load().ContainsKey(key);
     }
 
     public static T? Get<T>(string key, T? defaultValue = default)

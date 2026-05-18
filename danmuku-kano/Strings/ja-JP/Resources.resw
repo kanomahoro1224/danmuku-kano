@@ -26,6 +26,10 @@
   <data name="TextDensityNormal" xml:space="preserve"><value>標準</value></data>
   <data name="TextDensityMore" xml:space="preserve"><value>多い</value></data>
   <data name="TextDensityOverlap" xml:space="preserve"><value>重なり許可</value></data>
+  <data name="TextDisplayScreen" xml:space="preserve"><value>表示画面</value></data>
+  <data name="TextScreenPrimary" xml:space="preserve"><value>プライマリのみ</value></data>
+  <data name="TextScreenAll" xml:space="preserve"><value>すべての画面</value></data>
+  <data name="TextScreenMouse" xml:space="preserve"><value>マウスのある画面</value></data>
   <data name="TextFontAndColor" xml:space="preserve"><value>色とフォント</value></data>
   <data name="TextDefaultFont" xml:space="preserve"><value>デフォルト</value></data>
   <data name="TextDanmakuColorConfig" xml:space="preserve"><value>色設定</value></data>
@@ -45,6 +49,14 @@
   <data name="TextLanguageHant" xml:space="preserve"><value>繁体字中国語</value></data>
   <data name="TextLanguageEn" xml:space="preserve"><value>English</value></data>
   <data name="TextLanguageJa" xml:space="preserve"><value>日本語</value></data>
+  <data name="TextLanguageKo" xml:space="preserve"><value>韓国語</value></data>
+  <data name="TextLanguageFr" xml:space="preserve"><value>フランス語</value></data>
+  <data name="TextLanguageDe" xml:space="preserve"><value>ドイツ語</value></data>
+  <data name="TextLanguageEs" xml:space="preserve"><value>スペイン語</value></data>
+  <data name="TextLanguagePtBr" xml:space="preserve"><value>ポルトガル語（ブラジル）</value></data>
+  <data name="TextLanguageRu" xml:space="preserve"><value>ロシア語</value></data>
+  <data name="TextLanguageIt" xml:space="preserve"><value>イタリア語</value></data>
+  <data name="TextLanguageTr" xml:space="preserve"><value>トルコ語</value></data>
   <data name="TextCloseAction" xml:space="preserve"><value>メイン画面を閉じる時：</value></data>
   <data name="TextMinimizeToTray" xml:space="preserve"><value>トレイに閉じる</value></data>
   <data name="TextExitApp" xml:space="preserve"><value>終了</value></data>

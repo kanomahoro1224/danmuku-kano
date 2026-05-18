@@ -62,6 +62,14 @@
                         <RadioButton x:Name="DensityOverlap" Content="{x:Bind services:LocalizationService.Instance.TextDensityOverlap, Mode=OneWay}" GroupName="Density"/>
                     </StackPanel>
 
+                    <!-- Multi-screen support temporarily disabled -->
+                    <TextBlock Text="{x:Bind services:LocalizationService.Instance.TextDisplayScreen, Mode=OneWay}" Margin="0,12,0,4" Visibility="Collapsed"/>
+                    <StackPanel Orientation="Horizontal" Spacing="4" Visibility="Collapsed">
+                        <RadioButton x:Name="ScreenPrimary" Content="{x:Bind services:LocalizationService.Instance.TextScreenPrimary, Mode=OneWay}" IsChecked="True" GroupName="Screen"/>
+                        <RadioButton x:Name="ScreenAll" Content="{x:Bind services:LocalizationService.Instance.TextScreenAll, Mode=OneWay}" GroupName="Screen"/>
+                        <RadioButton x:Name="ScreenMouse" Content="{x:Bind services:LocalizationService.Instance.TextScreenMouse, Mode=OneWay}" GroupName="Screen"/>
+                    </StackPanel>
+
                     <TextBlock Text="{x:Bind services:LocalizationService.Instance.TextFontAndColor, Mode=OneWay}" Margin="0,12,0,4"/>
                     <StackPanel Spacing="12" Margin="0,0,0,12">
                         <ComboBox x:Name="FontFamilyCombo" Width="260" SelectedIndex="0" MaxDropDownHeight="420"/>
@@ -138,6 +146,14 @@
                         <ComboBoxItem Content="{x:Bind services:LocalizationService.Instance.TextLanguageHant, Mode=OneWay}"/>
                         <ComboBoxItem Content="{x:Bind services:LocalizationService.Instance.TextLanguageEn, Mode=OneWay}"/>
                         <ComboBoxItem Content="{x:Bind services:LocalizationService.Instance.TextLanguageJa, Mode=OneWay}"/>
+                        <ComboBoxItem Content="{x:Bind services:LocalizationService.Instance.TextLanguageKo, Mode=OneWay}"/>
+                        <ComboBoxItem Content="{x:Bind services:LocalizationService.Instance.TextLanguageFr, Mode=OneWay}"/>
+                        <ComboBoxItem Content="{x:Bind services:LocalizationService.Instance.TextLanguageDe, Mode=OneWay}"/>
+                        <ComboBoxItem Content="{x:Bind services:LocalizationService.Instance.TextLanguageEs, Mode=OneWay}"/>
+                        <ComboBoxItem Content="{x:Bind services:LocalizationService.Instance.TextLanguagePtBr, Mode=OneWay}"/>
+                        <ComboBoxItem Content="{x:Bind services:LocalizationService.Instance.TextLanguageRu, Mode=OneWay}"/>
+                        <ComboBoxItem Content="{x:Bind services:LocalizationService.Instance.TextLanguageIt, Mode=OneWay}"/>
+                        <ComboBoxItem Content="{x:Bind services:LocalizationService.Instance.TextLanguageTr, Mode=OneWay}"/>
                     </ComboBox>
 
                     <TextBlock Text="{x:Bind services:LocalizationService.Instance.TextCloseAction, Mode=OneWay}" Margin="0,24,0,8"/>
