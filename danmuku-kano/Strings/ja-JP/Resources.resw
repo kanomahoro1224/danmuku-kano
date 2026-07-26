@@ -15,9 +15,6 @@
   <data name="AppTitle" xml:space="preserve"><value>Kano 弾幕通知</value></data>
   <data name="NavStyle" xml:space="preserve"><value>弾幕スタイル</value></data>
   <data name="NavHistory" xml:space="preserve"><value>履歴</value></data>
-  <data name="TextProjectBasedOn" xml:space="preserve"><value>このプロジェクトは Windows App SDK (WinUI 3) をベースにしています。</value></data>
-  <data name="TextNoNativeTransparency" xml:space="preserve"><value>WinUI 3 には現在、ネイティブの透明な境界線なしウィンドウのサポートがなく、</value></data>
-  <data name="TextComplexHooks" xml:space="preserve"><value>弾幕描画は独立した WPF の透明ホストで処理し、メイン UI を閉じても動作を継続します。</value></data>
   <data name="TextFontSize" xml:space="preserve"><value>フォントサイズ(%)</value></data>
   <data name="TextSpeed" xml:space="preserve"><value>弾幕の速度</value></data>
   <data name="TextOpacity" xml:space="preserve"><value>不透明度(%)</value></data>

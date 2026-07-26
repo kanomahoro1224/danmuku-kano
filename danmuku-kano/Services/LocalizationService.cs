@@ -16,9 +16,6 @@ public sealed class LocalizationService : INotifyPropertyChanged
     public string NavStyle => GetString(nameof(NavStyle));
     public string NavHistory => GetString(nameof(NavHistory));
     public string NavAbout => GetString(nameof(NavAbout));
-    public string TextProjectBasedOn => GetString(nameof(TextProjectBasedOn));
-    public string TextNoNativeTransparency => GetString(nameof(TextNoNativeTransparency));
-    public string TextComplexHooks => GetString(nameof(TextComplexHooks));
     public string TextFontSize => GetString(nameof(TextFontSize));
     public string TextSpeed => GetString(nameof(TextSpeed));
     public string TextOpacity => GetString(nameof(TextOpacity));

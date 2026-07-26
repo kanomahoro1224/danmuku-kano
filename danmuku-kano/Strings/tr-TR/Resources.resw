@@ -15,9 +15,6 @@
   <data name="AppTitle" xml:space="preserve"><value>Kano Danmaku Bildirimi</value></data>
   <data name="NavStyle" xml:space="preserve"><value>Danmaku stili</value></data>
   <data name="NavHistory" xml:space="preserve"><value>Bildirim geçmişi</value></data>
-  <data name="TextProjectBasedOn" xml:space="preserve"><value>Bu proje Windows App SDK (WinUI 3) üzerine kuruludur.</value></data>
-  <data name="TextNoNativeTransparency" xml:space="preserve"><value>WinUI 3 şu anda şeffaf kenarlığı pencereleri yerel olarak desteklemiyor,</value></data>
-  <data name="TextComplexHooks" xml:space="preserve"><value>danmaku işleme, ana pencere kapatıldıktan sonra bile çalışmaya devam eden özel bir WPF şeffaf katmanı tarafından yönetilir.</value></data>
   <data name="TextFontSize" xml:space="preserve"><value>Yazı tipi boyutu (%)</value></data>
   <data name="TextSpeed" xml:space="preserve"><value>Danmaku hızı</value></data>
   <data name="TextOpacity" xml:space="preserve"><value>Opaklık (%)</value></data>

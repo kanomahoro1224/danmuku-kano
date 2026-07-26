@@ -15,9 +15,6 @@
   <data name="AppTitle" xml:space="preserve"><value>Kano Уведомление-Данмaku</value></data>
   <data name="NavStyle" xml:space="preserve"><value>Стиль данмaku</value></data>
   <data name="NavHistory" xml:space="preserve"><value>История уведомлений</value></data>
-  <data name="TextProjectBasedOn" xml:space="preserve"><value>Этот проект основан на Windows App SDK (WinUI 3).</value></data>
-  <data name="TextNoNativeTransparency" xml:space="preserve"><value>WinUI 3 в настоящее время не поддерживает прозрачные окна без рамки нативно,</value></data>
-  <data name="TextComplexHooks" xml:space="preserve"><value>рендеринг данмaku выполняется отдельным прозрачным слоем WPF, который продолжает работать даже после закрытия главного окна.</value></data>
   <data name="TextFontSize" xml:space="preserve"><value>Размер шрифта (%)</value></data>
   <data name="TextSpeed" xml:space="preserve"><value>Скорость данмaku</value></data>
   <data name="TextOpacity" xml:space="preserve"><value>Непрозрачность (%)</value></data>

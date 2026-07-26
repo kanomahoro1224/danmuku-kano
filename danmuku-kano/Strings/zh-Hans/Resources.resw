@@ -15,9 +15,6 @@
   <data name="AppTitle" xml:space="preserve"><value>Kano 弹幕通知</value></data>
   <data name="NavStyle" xml:space="preserve"><value>弹幕样式</value></data>
   <data name="NavHistory" xml:space="preserve"><value>历史通知</value></data>
-  <data name="TextProjectBasedOn" xml:space="preserve"><value>此项目基于 Windows App SDK (WinUI 3)。</value></data>
-  <data name="TextNoNativeTransparency" xml:space="preserve"><value>由于 WinUI 3 目前没有原生的透明无边界窗口支持，</value></data>
-  <data name="TextComplexHooks" xml:space="preserve"><value>弹幕渲染改为由独立的 WPF 透明宿主层负责，主界面关闭后仍可继续工作。</value></data>
   <data name="TextFontSize" xml:space="preserve"><value>字体大小(%)</value></data>
   <data name="TextSpeed" xml:space="preserve"><value>弹幕速度</value></data>
   <data name="TextOpacity" xml:space="preserve"><value>不透明度(%)</value></data>

@@ -38,11 +38,7 @@
             <ScrollViewer x:Name="StylePane" Visibility="Visible" VerticalScrollBarVisibility="Auto">
                 <StackPanel Padding="0,0,16,24">
                     <TextBlock Text="{x:Bind services:LocalizationService.Instance.NavStyle, Mode=OneWay}" Style="{ThemeResource TitleTextBlockStyle}" Margin="0,0,0,24"/>
-                    
-                    <TextBlock Text="{x:Bind services:LocalizationService.Instance.TextProjectBasedOn, Mode=OneWay}" Margin="0,0,0,12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                    <TextBlock Text="{x:Bind services:LocalizationService.Instance.TextNoNativeTransparency, Mode=OneWay}" Margin="0,0,0,4" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                    <TextBlock Text="{x:Bind services:LocalizationService.Instance.TextComplexHooks, Mode=OneWay}" Margin="0,0,0,24" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                    
+
                     <TextBlock Text="{x:Bind services:LocalizationService.Instance.TextFontSize, Mode=OneWay}" Margin="0,12,0,4"/>
                     <Slider x:Name="FontSizeSlider" Minimum="50" Maximum="300" Value="100" Width="300" HorizontalAlignment="Left"/>
                     
