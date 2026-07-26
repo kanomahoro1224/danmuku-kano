@@ -113,8 +113,13 @@ public sealed class Direct2DDanmakuRenderer : IDisposable
         }
     }
 
+    private bool _disposed;
+
     public void Dispose()
     {
+        if (_disposed) return;
+        _disposed = true;
+
         _running = false;
         _wake.Set();
         _renderThread?.Join(2000);
@@ -149,12 +154,30 @@ public sealed class Direct2DDanmakuRenderer : IDisposable
 
     private void RenderLoop()
     {
-        lock (_lock)
+        try
         {
-            _useDComp = InitDCompBackend();
-            CreateOverlays(Forms.Screen.AllScreens);
+            lock (_lock)
+            {
+                _useDComp = InitDCompBackend();
+                try
+                {
+                    CreateOverlays(Forms.Screen.AllScreens);
+                }
+                catch (Exception ex)
+                {
+                    CrashLog.Write("Overlay creation failed, falling back to legacy renderer", ex);
+                    RebuildAllPresentation(forceLegacy: true);
+                    CreateOverlays(Forms.Screen.AllScreens);
+                }
+            }
+            PrewarmText();
         }
-        PrewarmText();
+        catch (Exception ex)
+        {
+            // Never let the render thread take the process down with it
+            CrashLog.Write("Danmaku renderer failed to start; danmaku disabled", ex);
+            return;
+        }
 
         TimeBeginPeriod(1);
         long lastFrame = Stopwatch.GetTimestamp();
@@ -247,6 +270,12 @@ public sealed class Direct2DDanmakuRenderer : IDisposable
                 // legacy path if it keeps failing.
                 Debug.WriteLine($"Danmaku render failure: {ex.Message}");
                 failures++;
+                CrashLog.Write($"Render failure #{failures}", ex);
+                if (failures > 10)
+                {
+                    CrashLog.Write("Too many render failures; danmaku rendering disabled");
+                    break;
+                }
                 try
                 {
                     lock (_lock)
@@ -402,6 +431,7 @@ public sealed class Direct2DDanmakuRenderer : IDisposable
         catch (Exception ex)
         {
             Debug.WriteLine($"DirectComposition unavailable, using layered window path: {ex.Message}");
+            CrashLog.Write("DirectComposition unavailable, using layered window path", ex);
             DisposeDCompBackend();
             return false;
         }
@@ -441,7 +471,15 @@ public sealed class Direct2DDanmakuRenderer : IDisposable
             return existing;
 
         // Screen not yet known (e.g. hot-plugged monitor) — create on the fly
-        CreateOverlays(new[] { screen });
+        try
+        {
+            CreateOverlays(new[] { screen });
+        }
+        catch (Exception ex)
+        {
+            CrashLog.Write("Hot-plug overlay creation failed", ex);
+            return null;
+        }
         return _overlays.GetValueOrDefault(screen.DeviceName);
     }
 

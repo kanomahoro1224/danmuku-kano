@@ -35,6 +35,19 @@ namespace damuku_kano
         /// </summary>
         public App()
         {
+            UnhandledException += (s, e) =>
+            {
+                CrashLog.Write("XAML UnhandledException", e.Exception);
+                e.Handled = true;
+            };
+            AppDomain.CurrentDomain.UnhandledException += (s, e) =>
+                CrashLog.Write("AppDomain UnhandledException: " + (e.ExceptionObject?.ToString() ?? "unknown"));
+            System.Threading.Tasks.TaskScheduler.UnobservedTaskException += (s, e) =>
+            {
+                CrashLog.Write("UnobservedTaskException", e.Exception);
+                e.SetObserved();
+            };
+
             LocalizationService.Instance.ApplySavedLanguage();
 
             InitializeComponent();
