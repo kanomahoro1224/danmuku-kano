@@ -43,7 +43,9 @@
     <FrameworkReference Include="Microsoft.WindowsDesktop.App.WindowsForms" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.1721" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260317003" />
-    <PackageReference Include="Vortice.Direct2D1" Version="3.6.0" />
+    <PackageReference Include="Vortice.Direct2D1" Version="3.6.2" />
+    <PackageReference Include="Vortice.Direct3D11" Version="3.6.2" />
+    <PackageReference Include="Vortice.DirectComposition" Version="3.6.2" />
   </ItemGroup>
 
   <!--
@@ -94,4 +96,10 @@
   <PropertyGroup Condition="('$(PlatformTarget)' == '' or '$(PlatformTarget)' == 'AnyCPU') and '$(Platform)' == 'x64'">
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
+  <ItemGroup>
+    <EditorConfigFiles Remove="F:\WeChat\damuku-kano\danmuku-kano\.editorconfig" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="F:\WeChat\damuku-kano\danmuku-kano\.editorconfig" />
+  </ItemGroup>
 </Project>

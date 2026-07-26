@@ -84,4 +84,10 @@
   <data name="AboutArchitecture32" xml:space="preserve"><value>32-bit</value></data>
   <data name="AboutMadeByPrefix" xml:space="preserve"><value>Made with</value></data>
   <data name="AboutMadeBySuffix" xml:space="preserve"><value>by 鹿可可</value></data>
+  <data name="TextPerformanceMode" xml:space="preserve"><value>Performance Mode</value></data>
+  <data name="TextPerformanceModeDesc" xml:space="preserve"><value>Limiting the danmaku frame rate reduces the impact on game FPS; rendering pauses automatically when no danmaku is on screen.</value></data>
+  <data name="TextPerfFluent" xml:space="preserve"><value>Fluent (match display refresh rate)</value></data>
+  <data name="TextPerfBalanced" xml:space="preserve"><value>Balanced (up to 60 FPS)</value></data>
+  <data name="TextPerfGame" xml:space="preserve"><value>Gaming (up to 30 FPS, prioritize game FPS)</value></data>
+  <data name="TextPerfEco" xml:space="preserve"><value>Power Saver (up to 15 FPS)</value></data>
 </root>

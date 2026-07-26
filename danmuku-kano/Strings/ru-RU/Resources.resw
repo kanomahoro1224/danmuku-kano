@@ -84,4 +84,10 @@
   <data name="AboutArchitecture32" xml:space="preserve"><value>32-бит</value></data>
   <data name="AboutMadeByPrefix" xml:space="preserve"><value>Создано 鹿可可 с помощью</value></data>
   <data name="AboutMadeBySuffix" xml:space="preserve"><value></value></data>
+  <data name="TextPerformanceMode" xml:space="preserve"><value>Режим производительности</value></data>
+  <data name="TextPerformanceModeDesc" xml:space="preserve"><value>Ограничение частоты кадров данмаку снижает влияние на FPS игры; при отсутствии данмаку отрисовка автоматически приостанавливается.</value></data>
+  <data name="TextPerfFluent" xml:space="preserve"><value>Плавный (частота обновления экрана)</value></data>
+  <data name="TextPerfBalanced" xml:space="preserve"><value>Сбалансированный (до 60 кадров/с)</value></data>
+  <data name="TextPerfGame" xml:space="preserve"><value>Игровой (до 30 кадров/с, приоритет игре)</value></data>
+  <data name="TextPerfEco" xml:space="preserve"><value>Энергосбережение (до 15 кадров/с)</value></data>
 </root>

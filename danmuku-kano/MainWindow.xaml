@@ -164,6 +164,15 @@
                     </StackPanel>
 
                     <ToggleSwitch x:Name="AutoStartToggle" Header="{x:Bind services:LocalizationService.Instance.TextAutoStart, Mode=OneWay}" IsOn="False" Margin="0,24,0,0"/>
+
+                    <TextBlock Text="{x:Bind services:LocalizationService.Instance.TextPerformanceMode, Mode=OneWay}" Margin="0,24,0,4"/>
+                    <TextBlock Text="{x:Bind services:LocalizationService.Instance.TextPerformanceModeDesc, Mode=OneWay}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" Margin="0,0,0,8"/>
+                    <StackPanel Spacing="8">
+                        <RadioButton x:Name="PerfFluent" Content="{x:Bind services:LocalizationService.Instance.TextPerfFluent, Mode=OneWay}" IsChecked="True" GroupName="PerfMode"/>
+                        <RadioButton x:Name="PerfBalanced" Content="{x:Bind services:LocalizationService.Instance.TextPerfBalanced, Mode=OneWay}" GroupName="PerfMode"/>
+                        <RadioButton x:Name="PerfGame" Content="{x:Bind services:LocalizationService.Instance.TextPerfGame, Mode=OneWay}" GroupName="PerfMode"/>
+                        <RadioButton x:Name="PerfEco" Content="{x:Bind services:LocalizationService.Instance.TextPerfEco, Mode=OneWay}" GroupName="PerfMode"/>
+                    </StackPanel>
                 </StackPanel>
             </ScrollViewer>
 

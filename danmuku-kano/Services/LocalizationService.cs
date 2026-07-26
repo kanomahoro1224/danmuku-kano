@@ -63,6 +63,12 @@ public sealed class LocalizationService : INotifyPropertyChanged
     public string TextExitApp => GetString(nameof(TextExitApp));
     public string TextClosePrompt => GetString(nameof(TextClosePrompt));
     public string TextAutoStart => GetString(nameof(TextAutoStart));
+    public string TextPerformanceMode => GetString(nameof(TextPerformanceMode));
+    public string TextPerformanceModeDesc => GetString(nameof(TextPerformanceModeDesc));
+    public string TextPerfFluent => GetString(nameof(TextPerfFluent));
+    public string TextPerfBalanced => GetString(nameof(TextPerfBalanced));
+    public string TextPerfGame => GetString(nameof(TextPerfGame));
+    public string TextPerfEco => GetString(nameof(TextPerfEco));
     public string TrayAppShow => GetString(nameof(TrayAppShow));
     public string TrayAppExit => GetString(nameof(TrayAppExit));
     public string DialogTitle => GetString(nameof(DialogTitle));

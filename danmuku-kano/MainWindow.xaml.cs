@@ -58,6 +58,7 @@ public sealed partial class MainWindow : Window
         _ = SyncAutoStartToggleAsync();
 
         _renderer = new Direct2DDanmakuRenderer();
+        ApplyPerformanceMode();
         _renderer.Start();
 
         _notificationService = new NotificationService();
@@ -228,8 +229,35 @@ public sealed partial class MainWindow : Window
         
         Services.SettingsService.Set("CloseAction", CloseActionMinimize.IsChecked == true ? 0 : 1);
         Services.SettingsService.Set("ClosePrompt", CloseActionPrompt.IsChecked == true);
-        
+
+        Services.SettingsService.Set("PerformanceMode", GetSelectedPerformanceMode());
+        ApplyPerformanceMode();
+
         UpdateTrayMenuStrings();
+    }
+
+    private int GetSelectedPerformanceMode()
+    {
+        if (PerfBalanced.IsChecked == true) return 1;
+        if (PerfGame.IsChecked == true) return 2;
+        if (PerfEco.IsChecked == true) return 3;
+        return 0;
+    }
+
+    private static int MapPerformanceModeToFps(int mode)
+    {
+        return mode switch
+        {
+            1 => 60,
+            2 => 30,
+            3 => 15,
+            _ => 0 // 跟随屏幕刷新率
+        };
+    }
+
+    private void ApplyPerformanceMode()
+    {
+        _renderer?.SetMaxFps(MapPerformanceModeToFps(GetSelectedPerformanceMode()));
     }
     
     private void UpdateTrayMenuStrings()
@@ -408,6 +436,12 @@ public sealed partial class MainWindow : Window
             
             CloseActionPrompt.IsChecked = Services.SettingsService.Get<bool>("ClosePrompt", false);
             AutoStartToggle.IsOn = Services.SettingsService.Get<bool>("AutoStart", false);
+
+            int perfMode = Services.SettingsService.Get<int>("PerformanceMode", 0);
+            if (perfMode == 1) PerfBalanced.IsChecked = true;
+            else if (perfMode == 2) PerfGame.IsChecked = true;
+            else if (perfMode == 3) PerfEco.IsChecked = true;
+            else PerfFluent.IsChecked = true;
         }
         catch { }
         finally
@@ -444,6 +478,10 @@ public sealed partial class MainWindow : Window
         CloseActionExit.Checked += (s,e) => SaveSettings();
         CloseActionPrompt.Checked += (s,e) => SaveSettings();
         CloseActionPrompt.Unchecked += (s,e) => SaveSettings();
+        PerfFluent.Checked += (s,e) => SaveSettings();
+        PerfBalanced.Checked += (s,e) => SaveSettings();
+        PerfGame.Checked += (s,e) => SaveSettings();
+        PerfEco.Checked += (s,e) => SaveSettings();
         AutoStartToggle.Toggled += async (s,e) => 
         {
             if (_isUpdatingAutoStartToggle)
