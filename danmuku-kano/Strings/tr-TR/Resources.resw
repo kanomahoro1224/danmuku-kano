@@ -84,4 +84,10 @@
   <data name="AboutArchitecture32" xml:space="preserve"><value>32-bit</value></data>
   <data name="AboutMadeByPrefix" xml:space="preserve"><value>鹿可可 tarafından</value></data>
   <data name="AboutMadeBySuffix" xml:space="preserve"><value>ile yapıldı</value></data>
+  <data name="TextPerformanceMode" xml:space="preserve"><value>Performans modu</value></data>
+  <data name="TextPerformanceModeDesc" xml:space="preserve"><value>Danmaku kare hızını sınırlamak oyun FPS'ine etkisini azaltır; ekranda danmaku yokken çizim otomatik olarak duraklatılır.</value></data>
+  <data name="TextPerfFluent" xml:space="preserve"><value>Akıcı (ekran yenileme hızıyla eşit)</value></data>
+  <data name="TextPerfBalanced" xml:space="preserve"><value>Dengeli (en fazla 60 FPS)</value></data>
+  <data name="TextPerfGame" xml:space="preserve"><value>Oyun (en fazla 30 FPS, oyun öncelikli)</value></data>
+  <data name="TextPerfEco" xml:space="preserve"><value>Güç tasarrufu (en fazla 15 FPS)</value></data>
 </root>

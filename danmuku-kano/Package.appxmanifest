@@ -7,12 +7,13 @@
   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
   xmlns:systemai="http://schemas.microsoft.com/appx/manifest/systemai/windows10"
   xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
-  IgnorableNamespaces="uap rescap systemai desktop">
+  xmlns:uap10="http://schemas.microsoft.com/appx/manifest/uap/windows10/10"
+  IgnorableNamespaces="uap rescap systemai desktop uap10">
 
   <Identity
     Name="Official.Kano"
     Publisher="CN=3B84F6A6-A22D-4FDD-B37F-BC22D607430A"
-    Version="1.0.9.0" />
+    Version="1.12.0.0" />
 
   <mp:PhoneIdentity PhoneProductId="bb9befb1-431b-4290-8a81-46d15f3e8b56" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
@@ -45,7 +46,7 @@
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
       </uap:VisualElements>
       <Extensions>
-        <desktop:Extension Category="windows.startupTask" Executable="danmuku-kano.exe" EntryPoint="Windows.FullTrustApplication">
+        <desktop:Extension Category="windows.startupTask" Executable="danmuku-kano.exe" EntryPoint="Windows.FullTrustApplication" uap10:Parameters="--autostart">
           <desktop:StartupTask TaskId="KanoDanmakuStartupId" Enabled="false" DisplayName="damuku-kano" />
         </desktop:Extension>
       </Extensions>

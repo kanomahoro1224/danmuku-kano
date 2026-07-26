@@ -35,6 +35,21 @@ namespace damuku_kano
         /// </summary>
         public App()
         {
+            CrashLog.Write("App starting");
+
+            UnhandledException += (s, e) =>
+            {
+                CrashLog.Write("XAML UnhandledException", e.Exception);
+                e.Handled = true;
+            };
+            AppDomain.CurrentDomain.UnhandledException += (s, e) =>
+                CrashLog.Write("AppDomain UnhandledException: " + (e.ExceptionObject?.ToString() ?? "unknown"));
+            System.Threading.Tasks.TaskScheduler.UnobservedTaskException += (s, e) =>
+            {
+                CrashLog.Write("UnobservedTaskException", e.Exception);
+                e.SetObserved();
+            };
+
             LocalizationService.Instance.ApplySavedLanguage();
 
             InitializeComponent();
@@ -47,18 +62,16 @@ namespace damuku_kano
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
             _window = new MainWindow();
-            
-            var cmdArgs = Environment.GetCommandLineArgs();
-            if (cmdArgs.Contains("--autostart"))
+
+            var isAutoStart = Environment.GetCommandLineArgs()
+                .Any(arg => string.Equals(arg, "--autostart", StringComparison.OrdinalIgnoreCase));
+            if (isAutoStart)
             {
-                // Just activate in background if that's supported, else don't bring to front
-                // But for WinUI 3 the easiest way without complex native calls is just to launch and then minimize:
+                _window.AppWindow.Hide();
+                return;
             }
-            
-            if (!cmdArgs.Contains("--autostart"))
-            {
-                _window.Activate();
-            }
+
+            _window.Activate();
         }
     }
 }

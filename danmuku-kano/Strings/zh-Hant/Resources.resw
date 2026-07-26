@@ -84,4 +84,10 @@
   <data name="AboutArchitecture32" xml:space="preserve"><value>32 位元</value></data>
   <data name="AboutMadeByPrefix" xml:space="preserve"><value>由 鹿可可 用</value></data>
   <data name="AboutMadeBySuffix" xml:space="preserve"><value>製作</value></data>
+  <data name="TextPerformanceMode" xml:space="preserve"><value>效能調度</value></data>
+  <data name="TextPerformanceModeDesc" xml:space="preserve"><value>限制彈幕更新頻率可降低對遊戲幀率的影響；無彈幕時會自動暫停繪製。</value></data>
+  <data name="TextPerfFluent" xml:space="preserve"><value>流暢（跟隨螢幕更新頻率）</value></data>
+  <data name="TextPerfBalanced" xml:space="preserve"><value>均衡（最高 60 幀）</value></data>
+  <data name="TextPerfGame" xml:space="preserve"><value>遊戲（最高 30 幀，優先保證遊戲幀率）</value></data>
+  <data name="TextPerfEco" xml:space="preserve"><value>省電（最高 15 幀）</value></data>
 </root>

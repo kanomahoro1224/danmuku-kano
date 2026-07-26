@@ -26,8 +26,11 @@ public sealed class Direct2DDanmakuRenderer : IDisposable
     private readonly object _lock = new();
     private Thread? _renderThread;
     private volatile bool _running;
+    private volatile int _maxFps;
+    private readonly AutoResetEvent _wake = new(false);
     private WndProcDelegate? _wndProcDelegate;
     private bool _classRegistered;
+    private bool _disposed;
 
     public Direct2DDanmakuRenderer()
     {
@@ -44,6 +47,11 @@ public sealed class Direct2DDanmakuRenderer : IDisposable
         _renderThread.SetApartmentState(ApartmentState.STA);
         _renderThread.Start();
     }
+
+    /// <summary>
+    /// 0 = follow the display refresh rate (DwmFlush), >0 = cap the render loop at that FPS.
+    /// </summary>
+    public void SetMaxFps(int maxFps) => _maxFps = maxFps;
 
     /// <summary>
     /// Show a danmaku on a specific screen. Pass null to show on all screens.
@@ -70,6 +78,9 @@ public sealed class Direct2DDanmakuRenderer : IDisposable
                 }
             }
         }
+
+        // Wake the render thread immediately instead of waiting out the idle sleep
+        _wake.Set();
     }
 
     private DanmakuItem CreateItem(string text, byte[]? iconPng, DanmakuStyleSettings settings, ScreenOverlay overlay)
@@ -87,7 +98,11 @@ public sealed class Direct2DDanmakuRenderer : IDisposable
 
     public void Dispose()
     {
+        if (_disposed) return;
+        _disposed = true;
+
         _running = false;
+        _wake.Set();
         _renderThread?.Join(2000);
 
         lock (_lock)
@@ -104,6 +119,7 @@ public sealed class Direct2DDanmakuRenderer : IDisposable
             _overlays.Clear();
         }
 
+        _wake.Dispose();
         _wicFactory.Dispose();
         _dwFactory.Dispose();
         _d2dFactory.Dispose();
@@ -111,31 +127,95 @@ public sealed class Direct2DDanmakuRenderer : IDisposable
 
     private void RenderLoop()
     {
-        CreateOverlays(Forms.Screen.AllScreens);
-
-        while (_running)
+        try
         {
-            while (PeekMessageW(out var msg, IntPtr.Zero, 0, 0, 1))
-            {
-                TranslateMessage(ref msg);
-                DispatchMessageW(ref msg);
-            }
+            CreateOverlays(Forms.Screen.AllScreens);
+            CrashLog.Write("Renderer started");
+            PrewarmText();
 
-            lock (_lock)
+            TimeBeginPeriod(1);
+            long lastFrame = Stopwatch.GetTimestamp();
+            long lastTopmostAssert = 0;
+
+            while (_running)
             {
-                foreach (var overlay in _overlays.Values)
+                while (PeekMessageW(out var msg, IntPtr.Zero, 0, 0, 1))
                 {
-                    RenderOverlay(overlay);
+                    TranslateMessage(ref msg);
+                    DispatchMessageW(ref msg);
                 }
+
+                long now = Stopwatch.GetTimestamp();
+                bool assertTopmost = now - lastTopmostAssert > Stopwatch.Frequency;
+                if (assertTopmost) lastTopmostAssert = now;
+
+                bool anyVisible = false;
+                lock (_lock)
+                {
+                    foreach (var overlay in _overlays.Values)
+                    {
+                        if (overlay.Items.Count > 0)
+                        {
+                            if (!overlay.Visible)
+                            {
+                                ShowWindow(overlay.Hwnd, 8);
+                                SetWindowPos(overlay.Hwnd, HWND_TOPMOST, 0, 0, 0, 0, 0x0001 | 0x0002 | 0x0010);
+                                overlay.Visible = true;
+                            }
+                            else if (assertTopmost)
+                            {
+                                // Topmost windows created after ours end up above us in the
+                                // topmost band, so re-assert while danmaku are on screen.
+                                SetWindowPos(overlay.Hwnd, HWND_TOPMOST, 0, 0, 0, 0, 0x0001 | 0x0002 | 0x0010);
+                            }
+
+                            RenderOverlay(overlay);
+                            anyVisible = true;
+                        }
+                        else if (overlay.Visible)
+                        {
+                            // Hide when idle: a visible full-screen layered window forces DWM
+                            // composition and blocks games from using independent flip.
+                            ShowWindow(overlay.Hwnd, 0);
+                            overlay.Visible = false;
+                        }
+                    }
+                }
+
+                if (!anyVisible)
+                {
+                    _wake.WaitOne(50);
+                    lastFrame = Stopwatch.GetTimestamp();
+                    continue;
+                }
+
+                int maxFps = _maxFps;
+                if (maxFps <= 0)
+                {
+                    DwmFlush();
+                }
+                else
+                {
+                    long targetTicks = Stopwatch.Frequency / maxFps;
+                    long elapsed = Stopwatch.GetTimestamp() - lastFrame;
+                    int sleepMs = (int)((targetTicks - elapsed) * 1000 / Stopwatch.Frequency);
+                    if (sleepMs > 0) Thread.Sleep(sleepMs);
+                }
+                lastFrame = Stopwatch.GetTimestamp();
             }
 
-            DwmFlush();
+            TimeEndPeriod(1);
+        }
+        catch (Exception ex)
+        {
+            // Never let the render thread take the process down with it
+            CrashLog.Write("Danmaku render thread terminated", ex);
         }
     }
 
     private void CreateOverlays(Forms.Screen[] screens)
     {
-        _wndProcDelegate = WndProc;
+        _wndProcDelegate ??= WndProc;
         var hInstance = GetModuleHandleW(null);
         string className = "DanmakuD2DOverlay";
 
@@ -156,6 +236,8 @@ public sealed class Direct2DDanmakuRenderer : IDisposable
 
         foreach (var screen in screens)
         {
+            if (_overlays.ContainsKey(screen.DeviceName)) continue;
+
             var workArea = screen.WorkingArea;
             int w = workArea.Width;
             int h = workArea.Height;
@@ -164,9 +246,6 @@ public sealed class Direct2DDanmakuRenderer : IDisposable
                 exStyle, className, "DanmakuOverlay", WS_POPUP,
                 workArea.Left, workArea.Top, w, h,
                 IntPtr.Zero, IntPtr.Zero, hInstance, IntPtr.Zero);
-
-            ShowWindow(hwnd, 8);
-            SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, 0x0001 | 0x0002 | 0x0010);
 
             var screenDC = GetDC(IntPtr.Zero);
             var memDC = CreateCompatibleDC(screenDC);
@@ -202,6 +281,9 @@ public sealed class Direct2DDanmakuRenderer : IDisposable
                 HBitmap = hBitmap,
                 OldBitmap = oldBitmap,
                 RenderTarget = renderTarget,
+                Brush = renderTarget.CreateSolidColorBrush(new Color4(1, 1, 1, 1)),
+                OriginX = workArea.Left,
+                OriginY = workArea.Top,
                 Width = w,
                 Height = h
             };
@@ -214,8 +296,47 @@ public sealed class Direct2DDanmakuRenderer : IDisposable
             return existing;
 
         // Screen not yet known (e.g. hot-plugged monitor) — create on the fly
-        CreateOverlays(new[] { screen });
+        try
+        {
+            CreateOverlays(new[] { screen });
+        }
+        catch (Exception ex)
+        {
+            CrashLog.Write("Hot-plug overlay creation failed", ex);
+            return null;
+        }
         return _overlays.GetValueOrDefault(screen.DeviceName);
+    }
+
+    /// <summary>
+    /// First DirectWrite layout on a cold font cache can take seconds; pay that
+    /// cost at startup instead of on the first danmaku.
+    /// </summary>
+    private void PrewarmText()
+    {
+        try
+        {
+            using var format = _dwFactory.CreateTextFormat(
+                "Microsoft YaHei", null!, DWriteFontWeight.Bold,
+                DWriteFontStyle.Normal, DWriteFontStretch.Normal, 36f);
+            using var layout = _dwFactory.CreateTextLayout("弹幕预热 Warmup", format, float.MaxValue, 72f);
+            _ = layout.Metrics;
+
+            lock (_lock)
+            {
+                foreach (var overlay in _overlays.Values)
+                {
+                    var rt = overlay.RenderTarget;
+                    if (rt == null || overlay.Brush == null) continue;
+                    rt.BeginDraw();
+                    rt.Clear(new Color4(0, 0, 0, 0));
+                    rt.DrawTextLayout(new Vector2(0, 0), layout, overlay.Brush);
+                    rt.Clear(new Color4(0, 0, 0, 0));
+                    rt.EndDraw();
+                }
+            }
+        }
+        catch { }
     }
 
     private void RenderOverlay(ScreenOverlay overlay)
@@ -244,14 +365,17 @@ public sealed class Direct2DDanmakuRenderer : IDisposable
             }
 
             EnsureResources(item, rt);
-            DrawDanmaku(item, (float)x, rt);
+            if (x < overlay.Width)
+            {
+                DrawDanmaku(item, (float)x, overlay);
+            }
         }
 
         rt.EndDraw();
 
         var ptSrc = new POINT(0, 0);
         var size = new SIZE(overlay.Width, overlay.Height);
-        var ptDst = new POINT(0, 0);
+        var ptDst = new POINT(overlay.OriginX, overlay.OriginY);
         var blend = new BLENDFUNCTION { BlendOp = 0, BlendFlags = 0, SourceConstantAlpha = 255, AlphaFormat = 1 };
         UpdateLayeredWindow(overlay.Hwnd, IntPtr.Zero, ref ptDst, ref size, overlay.MemDC, ref ptSrc, 0, ref blend, 2);
     }
@@ -262,7 +386,7 @@ public sealed class Direct2DDanmakuRenderer : IDisposable
         {
             var s = item.Settings;
             using var format = _dwFactory.CreateTextFormat(
-                s.FontFamilyName, null,
+                s.FontFamilyName, null!,
                 s.Bold ? DWriteFontWeight.Bold : DWriteFontWeight.Normal,
                 DWriteFontStyle.Normal, DWriteFontStretch.Normal,
                 (float)s.FontSize);
@@ -288,9 +412,13 @@ public sealed class Direct2DDanmakuRenderer : IDisposable
         }
     }
 
-    private void DrawDanmaku(DanmakuItem item, float x, ID2D1DCRenderTarget rt)
+    private void DrawDanmaku(DanmakuItem item, float x, ScreenOverlay overlay)
     {
         if (item.TextLayout == null) return;
+
+        var rt = overlay.RenderTarget;
+        var brush = overlay.Brush;
+        if (rt == null || brush == null) return;
 
         var s = item.Settings;
         float y = item.TrackY;
@@ -313,34 +441,31 @@ public sealed class Direct2DDanmakuRenderer : IDisposable
         {
             float sd = (float)s.ShadowDepth;
             float so = (float)s.ShadowOpacity * opacity;
-            using var shadowBrush = rt.CreateSolidColorBrush(
-                new Color4(s.ShadowColor.R / 255f, s.ShadowColor.G / 255f,
-                           s.ShadowColor.B / 255f, so));
+            brush.Color = new Color4(s.ShadowColor.R / 255f, s.ShadowColor.G / 255f,
+                                     s.ShadowColor.B / 255f, so);
             rt.DrawTextLayout(
-                new Vector2(textX + sd, textY + sd), item.TextLayout, shadowBrush);
+                new Vector2(textX + sd, textY + sd), item.TextLayout, brush);
         }
 
         if (s.BorderThickness > 0)
         {
             float bt = (float)s.BorderThickness;
-            using var strokeBrush = rt.CreateSolidColorBrush(
-                new Color4(s.BorderColor.R / 255f, s.BorderColor.G / 255f,
-                           s.BorderColor.B / 255f, opacity));
+            brush.Color = new Color4(s.BorderColor.R / 255f, s.BorderColor.G / 255f,
+                                     s.BorderColor.B / 255f, opacity);
             for (int dx = -1; dx <= 1; dx++)
             for (int dy = -1; dy <= 1; dy++)
             {
                 if (dx == 0 && dy == 0) continue;
                 rt.DrawTextLayout(
                     new Vector2(textX + dx * bt, textY + dy * bt),
-                    item.TextLayout, strokeBrush);
+                    item.TextLayout, brush);
             }
         }
 
-        using var fillBrush = rt.CreateSolidColorBrush(
-            new Color4(s.Color.R / 255f, s.Color.G / 255f,
-                       s.Color.B / 255f, opacity));
+        brush.Color = new Color4(s.Color.R / 255f, s.Color.G / 255f,
+                                 s.Color.B / 255f, opacity);
         rt.DrawTextLayout(
-            new Vector2(textX, textY), item.TextLayout, fillBrush);
+            new Vector2(textX, textY), item.TextLayout, brush);
     }
 
     private void AssignTrack(DanmakuItem item, ScreenOverlay overlay)
@@ -399,12 +524,17 @@ public sealed class Direct2DDanmakuRenderer : IDisposable
         public IntPtr HBitmap;
         public IntPtr OldBitmap;
         public ID2D1DCRenderTarget? RenderTarget;
+        public ID2D1SolidColorBrush? Brush;
         public int Width;
         public int Height;
+        public int OriginX;
+        public int OriginY;
+        public bool Visible;
         public List<DanmakuItem> Items { get; } = new();
 
         public void Dispose()
         {
+            Brush?.Dispose();
             RenderTarget?.Dispose();
 
             if (MemDC != IntPtr.Zero)
@@ -556,6 +686,12 @@ public sealed class Direct2DDanmakuRenderer : IDisposable
 
     [DllImport("dwmapi.dll")]
     private static extern int DwmFlush();
+
+    [DllImport("winmm.dll", EntryPoint = "timeBeginPeriod")]
+    private static extern uint TimeBeginPeriod(uint uPeriod);
+
+    [DllImport("winmm.dll", EntryPoint = "timeEndPeriod")]
+    private static extern uint TimeEndPeriod(uint uPeriod);
 
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
     private static extern IntPtr GetModuleHandleW(string? lpModuleName);

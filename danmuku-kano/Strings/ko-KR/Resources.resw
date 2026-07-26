@@ -84,4 +84,10 @@
   <data name="AboutArchitecture32" xml:space="preserve"><value>32비트</value></data>
   <data name="AboutMadeByPrefix" xml:space="preserve"><value>鹿可可이</value></data>
   <data name="AboutMadeBySuffix" xml:space="preserve"><value>로 제작</value></data>
+  <data name="TextPerformanceMode" xml:space="preserve"><value>성능 모드</value></data>
+  <data name="TextPerformanceModeDesc" xml:space="preserve"><value>탄막 프레임 속도를 제한하면 게임 FPS에 미치는 영향을 줄일 수 있습니다. 탄막이 없으면 렌더링이 자동으로 일시 중지됩니다.</value></data>
+  <data name="TextPerfFluent" xml:space="preserve"><value>부드러움(화면 주사율 동기화)</value></data>
+  <data name="TextPerfBalanced" xml:space="preserve"><value>균형(최대 60 FPS)</value></data>
+  <data name="TextPerfGame" xml:space="preserve"><value>게임(최대 30 FPS, 게임 우선)</value></data>
+  <data name="TextPerfEco" xml:space="preserve"><value>절전(최대 15 FPS)</value></data>
 </root>
