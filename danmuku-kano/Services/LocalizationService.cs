@@ -30,6 +30,7 @@ public sealed class LocalizationService : INotifyPropertyChanged
     public string TextDisplayScreen => GetString(nameof(TextDisplayScreen));
     public string TextScreenPrimary => GetString(nameof(TextScreenPrimary));
     public string TextScreenAll => GetString(nameof(TextScreenAll));
+    public string TextScreenSpan => GetString(nameof(TextScreenSpan));
     public string TextScreenMouse => GetString(nameof(TextScreenMouse));
     public string TextFontAndColor => GetString(nameof(TextFontAndColor));
     public string TextDefaultFont => GetString(nameof(TextDefaultFont));

@@ -62,12 +62,16 @@
                         <RadioButton x:Name="DensityOverlap" Content="{x:Bind services:LocalizationService.Instance.TextDensityOverlap, Mode=OneWay}" GroupName="Density"/>
                     </StackPanel>
 
-                    <!-- Multi-screen support temporarily disabled -->
-                    <TextBlock Text="{x:Bind services:LocalizationService.Instance.TextDisplayScreen, Mode=OneWay}" Margin="0,12,0,4" Visibility="Collapsed"/>
-                    <StackPanel Orientation="Horizontal" Spacing="4" Visibility="Collapsed">
-                        <RadioButton x:Name="ScreenPrimary" Content="{x:Bind services:LocalizationService.Instance.TextScreenPrimary, Mode=OneWay}" IsChecked="True" GroupName="Screen"/>
-                        <RadioButton x:Name="ScreenAll" Content="{x:Bind services:LocalizationService.Instance.TextScreenAll, Mode=OneWay}" GroupName="Screen"/>
-                        <RadioButton x:Name="ScreenMouse" Content="{x:Bind services:LocalizationService.Instance.TextScreenMouse, Mode=OneWay}" GroupName="Screen"/>
+                    <TextBlock Text="{x:Bind services:LocalizationService.Instance.TextDisplayScreen, Mode=OneWay}" Margin="0,12,0,4"/>
+                    <StackPanel Spacing="4">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <RadioButton x:Name="ScreenPrimary" Content="{x:Bind services:LocalizationService.Instance.TextScreenPrimary, Mode=OneWay}" IsChecked="True" GroupName="Screen"/>
+                            <RadioButton x:Name="ScreenAll" Content="{x:Bind services:LocalizationService.Instance.TextScreenAll, Mode=OneWay}" GroupName="Screen"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <RadioButton x:Name="ScreenSpan" Content="{x:Bind services:LocalizationService.Instance.TextScreenSpan, Mode=OneWay}" GroupName="Screen"/>
+                            <RadioButton x:Name="ScreenMouse" Content="{x:Bind services:LocalizationService.Instance.TextScreenMouse, Mode=OneWay}" GroupName="Screen"/>
+                        </StackPanel>
                     </StackPanel>
 
                     <TextBlock Text="{x:Bind services:LocalizationService.Instance.TextFontAndColor, Mode=OneWay}" Margin="0,12,0,4"/>

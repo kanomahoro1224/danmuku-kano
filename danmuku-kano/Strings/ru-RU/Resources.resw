@@ -28,7 +28,8 @@
   <data name="TextDensityOverlap" xml:space="preserve"><value>Перекрытие</value></data>
   <data name="TextDisplayScreen" xml:space="preserve"><value>Экран отображения</value></data>
   <data name="TextScreenPrimary" xml:space="preserve"><value>Только основной экран</value></data>
-  <data name="TextScreenAll" xml:space="preserve"><value>Все экраны</value></data>
+  <data name="TextScreenAll" xml:space="preserve"><value>Все экраны (дублировать)</value></data>
+  <data name="TextScreenSpan" xml:space="preserve"><value>Непрерывно между экранами</value></data>
   <data name="TextScreenMouse" xml:space="preserve"><value>Экран с курсором</value></data>
   <data name="TextFontAndColor" xml:space="preserve"><value>Цвет и шрифт</value></data>
   <data name="TextDefaultFont" xml:space="preserve"><value>Шрифт по умолчанию</value></data>

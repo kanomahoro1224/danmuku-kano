@@ -28,7 +28,8 @@
   <data name="TextDensityOverlap" xml:space="preserve"><value>Überlappung</value></data>
   <data name="TextDisplayScreen" xml:space="preserve"><value>Anzeigebildschirm</value></data>
   <data name="TextScreenPrimary" xml:space="preserve"><value>Nur Hauptbildschirm</value></data>
-  <data name="TextScreenAll" xml:space="preserve"><value>Alle Bildschirme</value></data>
+  <data name="TextScreenAll" xml:space="preserve"><value>Alle Bildschirme (duplizieren)</value></data>
+  <data name="TextScreenSpan" xml:space="preserve"><value>Über Bildschirme hinweg</value></data>
   <data name="TextScreenMouse" xml:space="preserve"><value>Bildschirm mit Mauszeiger</value></data>
   <data name="TextFontAndColor" xml:space="preserve"><value>Farbe und Schrift</value></data>
   <data name="TextDefaultFont" xml:space="preserve"><value>Standardschrift</value></data>
