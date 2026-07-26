@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -22,8 +23,16 @@ public sealed class Direct2DDanmakuRenderer : IDisposable
     private readonly ID2D1Factory _d2dFactory;
     private readonly IDWriteFactory _dwFactory;
     private readonly IWICImagingFactory _wicFactory;
+    // Overlays (and their windows/DCs) are owned by the render thread;
+    // other threads only enqueue requests.
     private readonly Dictionary<string, ScreenOverlay> _overlays = new();
-    private readonly object _lock = new();
+    private readonly ConcurrentQueue<DanmakuRequest> _requests = new();
+    // Extra overlay spanning all screens for DisplayScreenMode 3; created on demand.
+    // Real device names look like "\\.\DISPLAY1", so this key cannot collide.
+    private const string SpanKey = "\\SPAN";
+    private bool _spanActive;
+    private volatile bool _displayChanged;
+    private long _pendingResync;
     private Thread? _renderThread;
     private volatile bool _running;
     private volatile int _maxFps;
@@ -53,47 +62,29 @@ public sealed class Direct2DDanmakuRenderer : IDisposable
     /// </summary>
     public void SetMaxFps(int maxFps) => _maxFps = maxFps;
 
+    private static readonly char[] NewlineChars = { '\r', '\n' };
+
     /// <summary>
-    /// Show a danmaku on a specific screen. Pass null to show on all screens.
+    /// Queue a danmaku; the target screen(s) follow settings.DisplayScreenMode
+    /// (0 = primary, 1 = every screen gets its own copy, 2 = screen under the
+    /// mouse cursor, 3 = one continuous flow across all screens).
     /// </summary>
-    public void ShowDanmaku(string text, byte[]? iconPng, DanmakuStyleSettings settings, Forms.Screen? targetScreen = null)
+    public void ShowDanmaku(string text, byte[]? iconPng, DanmakuStyleSettings settings)
     {
-        lock (_lock)
+        // Toast bodies are often multi-line; a multi-line layout would spill into
+        // the tracks below, so danmaku are always a single line.
+        string singleLine = string.Join(' ', text.Split(NewlineChars,
+            StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
+
+        _requests.Enqueue(new DanmakuRequest
         {
-            if (targetScreen != null)
-            {
-                var overlay = GetOrCreateOverlay(targetScreen);
-                if (overlay != null)
-                {
-                    var item = CreateItem(text, iconPng, settings, overlay);
-                    _overlays[targetScreen.DeviceName].Items.Add(item);
-                }
-            }
-            else
-            {
-                foreach (var kvp in _overlays)
-                {
-                    var item = CreateItem(text, iconPng, settings, kvp.Value);
-                    kvp.Value.Items.Add(item);
-                }
-            }
-        }
+            Text = singleLine,
+            IconPng = iconPng,
+            Settings = settings
+        });
 
         // Wake the render thread immediately instead of waiting out the idle sleep
         _wake.Set();
-    }
-
-    private DanmakuItem CreateItem(string text, byte[]? iconPng, DanmakuStyleSettings settings, ScreenOverlay overlay)
-    {
-        var item = new DanmakuItem
-        {
-            Text = text,
-            IconPng = iconPng,
-            Settings = settings,
-            StartTime = Stopwatch.GetTimestamp()
-        };
-        AssignTrack(item, overlay);
-        return item;
     }
 
     public void Dispose()
@@ -103,21 +94,8 @@ public sealed class Direct2DDanmakuRenderer : IDisposable
 
         _running = false;
         _wake.Set();
+        // Overlay windows belong to the render thread and are destroyed there on exit.
         _renderThread?.Join(2000);
-
-        lock (_lock)
-        {
-            foreach (var overlay in _overlays.Values)
-            {
-                foreach (var item in overlay.Items)
-                {
-                    item.TextLayout?.Dispose();
-                    item.IconBitmap?.Dispose();
-                }
-                overlay.Dispose();
-            }
-            _overlays.Clear();
-        }
 
         _wake.Dispose();
         _wicFactory.Dispose();
@@ -129,7 +107,7 @@ public sealed class Direct2DDanmakuRenderer : IDisposable
     {
         try
         {
-            CreateOverlays(Forms.Screen.AllScreens);
+            SyncOverlays();
             CrashLog.Write("Renderer started");
             PrewarmText();
 
@@ -145,40 +123,56 @@ public sealed class Direct2DDanmakuRenderer : IDisposable
                     DispatchMessageW(ref msg);
                 }
 
+                if (_displayChanged)
+                {
+                    _displayChanged = false;
+                    SyncOverlays();
+                    // Displays settle in waves (driver re-detection, shell work-area
+                    // updates) and WinForms' Screen cache may refresh after we ran —
+                    // sync once more a second later to catch the final layout.
+                    _pendingResync = Stopwatch.GetTimestamp() + Stopwatch.Frequency;
+                }
+                else if (_pendingResync != 0 && Stopwatch.GetTimestamp() >= _pendingResync)
+                {
+                    _pendingResync = 0;
+                    SyncOverlays();
+                }
+
+                DispatchRequests();
+
                 long now = Stopwatch.GetTimestamp();
                 bool assertTopmost = now - lastTopmostAssert > Stopwatch.Frequency;
                 if (assertTopmost) lastTopmostAssert = now;
 
                 bool anyVisible = false;
-                lock (_lock)
+                foreach (var overlay in _overlays.Values)
                 {
-                    foreach (var overlay in _overlays.Values)
-                    {
-                        if (overlay.Items.Count > 0)
-                        {
-                            if (!overlay.Visible)
-                            {
-                                ShowWindow(overlay.Hwnd, 8);
-                                SetWindowPos(overlay.Hwnd, HWND_TOPMOST, 0, 0, 0, 0, 0x0001 | 0x0002 | 0x0010);
-                                overlay.Visible = true;
-                            }
-                            else if (assertTopmost)
-                            {
-                                // Topmost windows created after ours end up above us in the
-                                // topmost band, so re-assert while danmaku are on screen.
-                                SetWindowPos(overlay.Hwnd, HWND_TOPMOST, 0, 0, 0, 0, 0x0001 | 0x0002 | 0x0010);
-                            }
+                    SpawnPending(overlay);
 
-                            RenderOverlay(overlay);
-                            anyVisible = true;
-                        }
-                        else if (overlay.Visible)
+                    if (overlay.Items.Count > 0)
+                    {
+                        if (!overlay.Visible)
                         {
-                            // Hide when idle: a visible full-screen layered window forces DWM
-                            // composition and blocks games from using independent flip.
-                            ShowWindow(overlay.Hwnd, 0);
-                            overlay.Visible = false;
+                            ShowWindow(overlay.Hwnd, 8);
+                            SetWindowPos(overlay.Hwnd, HWND_TOPMOST, 0, 0, 0, 0, 0x0001 | 0x0002 | 0x0010);
+                            overlay.Visible = true;
                         }
+                        else if (assertTopmost)
+                        {
+                            // Topmost windows created after ours end up above us in the
+                            // topmost band, so re-assert while danmaku are on screen.
+                            SetWindowPos(overlay.Hwnd, HWND_TOPMOST, 0, 0, 0, 0, 0x0001 | 0x0002 | 0x0010);
+                        }
+
+                        RenderOverlay(overlay);
+                        anyVisible = true;
+                    }
+                    else if (overlay.Visible)
+                    {
+                        // Hide when idle: a visible full-screen layered window forces DWM
+                        // composition and blocks games from using independent flip.
+                        ShowWindow(overlay.Hwnd, 0);
+                        overlay.Visible = false;
                     }
                 }
 
@@ -211,9 +205,30 @@ public sealed class Direct2DDanmakuRenderer : IDisposable
             // Never let the render thread take the process down with it
             CrashLog.Write("Danmaku render thread terminated", ex);
         }
+        finally
+        {
+            // Overlay windows belong to this thread; DestroyWindow fails cross-thread.
+            foreach (var overlay in _overlays.Values)
+            {
+                DisposeItems(overlay);
+                overlay.Dispose();
+            }
+            _overlays.Clear();
+        }
     }
 
     private void CreateOverlays(Forms.Screen[] screens)
+    {
+        foreach (var screen in screens)
+        {
+            if (_overlays.ContainsKey(screen.DeviceName)) continue;
+
+            var workArea = screen.WorkingArea;
+            CreateOverlay(screen.DeviceName, workArea.Left, workArea.Top, workArea.Width, workArea.Height);
+        }
+    }
+
+    private void CreateOverlay(string key, int left, int top, int w, int h)
     {
         _wndProcDelegate ??= WndProc;
         var hInstance = GetModuleHandleW(null);
@@ -234,78 +249,286 @@ public sealed class Direct2DDanmakuRenderer : IDisposable
         uint exStyle = WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_TOPMOST
                      | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE;
 
-        foreach (var screen in screens)
+        var hwnd = CreateWindowExW(
+            exStyle, className, "DanmakuOverlay", WS_POPUP,
+            left, top, w, h,
+            IntPtr.Zero, IntPtr.Zero, hInstance, IntPtr.Zero);
+
+        var screenDC = GetDC(IntPtr.Zero);
+        var memDC = CreateCompatibleDC(screenDC);
+
+        var bmi = new BITMAPINFO();
+        bmi.bmiHeader.biSize = Marshal.SizeOf<BITMAPINFOHEADER>();
+        bmi.bmiHeader.biWidth = w;
+        bmi.bmiHeader.biHeight = -h;
+        bmi.bmiHeader.biPlanes = 1;
+        bmi.bmiHeader.biBitCount = 32;
+        bmi.bmiHeader.biCompression = 0;
+        var hBitmap = CreateDIBSection(screenDC, ref bmi, 0, out _, IntPtr.Zero, 0);
+        var oldBitmap = SelectObject(memDC, hBitmap);
+        ReleaseDC(IntPtr.Zero, screenDC);
+
+        var props = new RenderTargetProperties
         {
-            if (_overlays.ContainsKey(screen.DeviceName)) continue;
+            Type = RenderTargetType.Default,
+            PixelFormat = new Vortice.DCommon.PixelFormat(
+                Vortice.DXGI.Format.B8G8R8A8_UNorm,
+                Vortice.DCommon.AlphaMode.Premultiplied),
+            DpiX = 96, DpiY = 96
+        };
 
-            var workArea = screen.WorkingArea;
-            int w = workArea.Width;
-            int h = workArea.Height;
+        var renderTarget = _d2dFactory.CreateDCRenderTarget(props);
+        renderTarget.BindDC(memDC, new RawRect(0, 0, w, h));
 
-            var hwnd = CreateWindowExW(
-                exStyle, className, "DanmakuOverlay", WS_POPUP,
-                workArea.Left, workArea.Top, w, h,
-                IntPtr.Zero, IntPtr.Zero, hInstance, IntPtr.Zero);
-
-            var screenDC = GetDC(IntPtr.Zero);
-            var memDC = CreateCompatibleDC(screenDC);
-
-            var bmi = new BITMAPINFO();
-            bmi.bmiHeader.biSize = Marshal.SizeOf<BITMAPINFOHEADER>();
-            bmi.bmiHeader.biWidth = w;
-            bmi.bmiHeader.biHeight = -h;
-            bmi.bmiHeader.biPlanes = 1;
-            bmi.bmiHeader.biBitCount = 32;
-            bmi.bmiHeader.biCompression = 0;
-            var hBitmap = CreateDIBSection(screenDC, ref bmi, 0, out _, IntPtr.Zero, 0);
-            var oldBitmap = SelectObject(memDC, hBitmap);
-            ReleaseDC(IntPtr.Zero, screenDC);
-
-            var props = new RenderTargetProperties
-            {
-                Type = RenderTargetType.Default,
-                PixelFormat = new Vortice.DCommon.PixelFormat(
-                    Vortice.DXGI.Format.B8G8R8A8_UNorm,
-                    Vortice.DCommon.AlphaMode.Premultiplied),
-                DpiX = 96, DpiY = 96
-            };
-
-            var renderTarget = _d2dFactory.CreateDCRenderTarget(props);
-            renderTarget.BindDC(memDC, new RawRect(0, 0, w, h));
-
-            _overlays[screen.DeviceName] = new ScreenOverlay
-            {
-                Screen = screen,
-                Hwnd = hwnd,
-                MemDC = memDC,
-                HBitmap = hBitmap,
-                OldBitmap = oldBitmap,
-                RenderTarget = renderTarget,
-                Brush = renderTarget.CreateSolidColorBrush(new Color4(1, 1, 1, 1)),
-                OriginX = workArea.Left,
-                OriginY = workArea.Top,
-                Width = w,
-                Height = h
-            };
-        }
+        _overlays[key] = new ScreenOverlay
+        {
+            Hwnd = hwnd,
+            MemDC = memDC,
+            HBitmap = hBitmap,
+            OldBitmap = oldBitmap,
+            RenderTarget = renderTarget,
+            Brush = renderTarget.CreateSolidColorBrush(new Color4(1, 1, 1, 1)),
+            OriginX = left,
+            OriginY = top,
+            Width = w,
+            Height = h
+        };
     }
 
-    private ScreenOverlay? GetOrCreateOverlay(Forms.Screen screen)
+    /// <summary>
+    /// Rect for the cross-screen overlay: horizontal union of all work areas,
+    /// vertical intersection — danmaku only travel through the band every screen
+    /// shows, so they are never clipped by a screen edge mid-flight.
+    /// Returns null when the screens don't overlap vertically.
+    /// </summary>
+    private static (int Left, int Top, int Width, int Height)? ComputeSpanRect(Forms.Screen[] screens)
     {
-        if (_overlays.TryGetValue(screen.DeviceName, out var existing))
-            return existing;
+        if (screens.Length == 0) return null;
 
-        // Screen not yet known (e.g. hot-plugged monitor) — create on the fly
+        int left = int.MaxValue, right = int.MinValue;
+        int top = int.MinValue, bottom = int.MaxValue;
+        foreach (var screen in screens)
+        {
+            var workArea = screen.WorkingArea;
+            left = Math.Min(left, workArea.Left);
+            right = Math.Max(right, workArea.Right);
+            top = Math.Max(top, workArea.Top);
+            bottom = Math.Min(bottom, workArea.Bottom);
+        }
+
+        if (bottom - top < 40) return null; // not even one small track fits
+        return (left, top, right - left, bottom - top);
+    }
+
+    /// <summary>
+    /// Bring the overlay set in line with the current monitor layout: drop overlays
+    /// for unplugged screens, recreate ones whose geometry changed, add new screens.
+    /// Runs on the render thread only (overlay windows belong to it).
+    /// </summary>
+    private void SyncOverlays()
+    {
+        Forms.Screen[] screens;
         try
         {
-            CreateOverlays(new[] { screen });
+            screens = Forms.Screen.AllScreens;
         }
         catch (Exception ex)
         {
-            CrashLog.Write("Hot-plug overlay creation failed", ex);
-            return null;
+            CrashLog.Write("Screen enumeration failed", ex);
+            return;
         }
-        return _overlays.GetValueOrDefault(screen.DeviceName);
+
+        var spanRect = _spanActive ? ComputeSpanRect(screens) : null;
+        Dictionary<string, Queue<DanmakuItem>>? carriedPending = null;
+
+        foreach (var key in new List<string>(_overlays.Keys))
+        {
+            var overlay = _overlays[key];
+
+            (int Left, int Top, int Width, int Height)? desired;
+            if (key == SpanKey)
+            {
+                desired = spanRect;
+            }
+            else
+            {
+                var screen = Array.Find(screens, x => x.DeviceName == key);
+                desired = screen == null
+                    ? null
+                    : (screen.WorkingArea.Left, screen.WorkingArea.Top,
+                       screen.WorkingArea.Width, screen.WorkingArea.Height);
+            }
+
+            if (desired is { } rect &&
+                rect.Left == overlay.OriginX && rect.Top == overlay.OriginY &&
+                rect.Width == overlay.Width && rect.Height == overlay.Height)
+            {
+                continue;
+            }
+
+            // Geometry changed: recreate the overlay. On-screen danmaku are tied to
+            // the old coordinates and get dropped, queued ones are carried over.
+            if (desired != null && overlay.Pending.Count > 0)
+            {
+                carriedPending ??= new Dictionary<string, Queue<DanmakuItem>>();
+                carriedPending[key] = new Queue<DanmakuItem>(overlay.Pending);
+                overlay.Pending.Clear();
+            }
+
+            DisposeItems(overlay);
+            overlay.Dispose();
+            _overlays.Remove(key);
+        }
+
+        try
+        {
+            CreateOverlays(screens);
+            if (spanRect is { } span && !_overlays.ContainsKey(SpanKey))
+            {
+                CreateOverlay(SpanKey, span.Left, span.Top, span.Width, span.Height);
+            }
+        }
+        catch (Exception ex)
+        {
+            CrashLog.Write("Overlay creation failed", ex);
+        }
+
+        if (carriedPending != null)
+        {
+            foreach (var kvp in carriedPending)
+            {
+                if (_overlays.TryGetValue(kvp.Key, out var overlay))
+                {
+                    while (kvp.Value.Count > 0) overlay.Pending.Enqueue(kvp.Value.Dequeue());
+                }
+            }
+        }
+    }
+
+    private void DispatchRequests()
+    {
+        while (_requests.TryDequeue(out var request))
+        {
+            switch (request.Settings.DisplayScreenMode)
+            {
+                case 1: // every screen shows its own copy
+                    EnqueueMirrored(request);
+                    break;
+
+                case 2: // screen under the mouse cursor
+                {
+                    string device = Forms.Screen.FromPoint(Forms.Cursor.Position).DeviceName;
+                    if (!_overlays.TryGetValue(device, out var target))
+                    {
+                        // Screen not yet known (e.g. hot-plugged monitor) — pick it up now
+                        SyncOverlays();
+                        if (!_overlays.TryGetValue(device, out target))
+                        {
+                            target = FindPrimaryOverlay();
+                        }
+                    }
+                    target?.Pending.Enqueue(NewItem(request));
+                    break;
+                }
+
+                case 3: // one continuous flow across all screens
+                {
+                    _spanActive = true;
+                    if (!_overlays.TryGetValue(SpanKey, out var span))
+                    {
+                        SyncOverlays();
+                        _overlays.TryGetValue(SpanKey, out span);
+                    }
+
+                    if (span != null)
+                    {
+                        span.Pending.Enqueue(NewItem(request));
+                    }
+                    else
+                    {
+                        // Screens share no vertical band (e.g. stacked) — a crossing
+                        // danmaku would get clipped, so fall back to per-screen copies.
+                        EnqueueMirrored(request);
+                    }
+                    break;
+                }
+
+                default: // primary screen
+                    FindPrimaryOverlay()?.Pending.Enqueue(NewItem(request));
+                    break;
+            }
+        }
+    }
+
+    private void EnqueueMirrored(DanmakuRequest request)
+    {
+        foreach (var kvp in _overlays)
+        {
+            if (kvp.Key != SpanKey)
+            {
+                kvp.Value.Pending.Enqueue(NewItem(request));
+            }
+        }
+    }
+
+    private ScreenOverlay? FindPrimaryOverlay()
+    {
+        var primary = Forms.Screen.PrimaryScreen;
+        if (primary != null && _overlays.TryGetValue(primary.DeviceName, out var overlay))
+        {
+            return overlay;
+        }
+
+        foreach (var kvp in _overlays)
+        {
+            if (kvp.Key != SpanKey) return kvp.Value;
+        }
+        return null;
+    }
+
+    private static DanmakuItem NewItem(DanmakuRequest request) => new()
+    {
+        Text = request.Text,
+        IconPng = request.IconPng,
+        Settings = request.Settings
+    };
+
+    /// <summary>
+    /// Move queued danmaku onto free tracks in arrival order. An item stays queued
+    /// until some track can take it without overlapping (unless density allows overlap).
+    /// </summary>
+    private void SpawnPending(ScreenOverlay overlay)
+    {
+        while (overlay.Pending.Count > 0)
+        {
+            var item = overlay.Pending.Peek();
+            EnsureTextLayout(item); // need the real width before picking a track
+            if (!TryAssignTrack(item, overlay))
+            {
+                break; // keep FIFO order; retry next frame
+            }
+
+            item.StartTime = Stopwatch.GetTimestamp();
+            overlay.Pending.Dequeue();
+            overlay.Items.Add(item);
+        }
+    }
+
+    private static void DisposeItems(ScreenOverlay overlay)
+    {
+        foreach (var item in overlay.Items)
+        {
+            item.TextLayout?.Dispose();
+            item.IconBitmap?.Dispose();
+        }
+        overlay.Items.Clear();
+
+        while (overlay.Pending.Count > 0)
+        {
+            var pending = overlay.Pending.Dequeue();
+            pending.TextLayout?.Dispose();
+            pending.IconBitmap?.Dispose();
+        }
     }
 
     /// <summary>
@@ -322,18 +545,15 @@ public sealed class Direct2DDanmakuRenderer : IDisposable
             using var layout = _dwFactory.CreateTextLayout("弹幕预热 Warmup", format, float.MaxValue, 72f);
             _ = layout.Metrics;
 
-            lock (_lock)
+            foreach (var overlay in _overlays.Values)
             {
-                foreach (var overlay in _overlays.Values)
-                {
-                    var rt = overlay.RenderTarget;
-                    if (rt == null || overlay.Brush == null) continue;
-                    rt.BeginDraw();
-                    rt.Clear(new Color4(0, 0, 0, 0));
-                    rt.DrawTextLayout(new Vector2(0, 0), layout, overlay.Brush);
-                    rt.Clear(new Color4(0, 0, 0, 0));
-                    rt.EndDraw();
-                }
+                var rt = overlay.RenderTarget;
+                if (rt == null || overlay.Brush == null) continue;
+                rt.BeginDraw();
+                rt.Clear(new Color4(0, 0, 0, 0));
+                rt.DrawTextLayout(new Vector2(0, 0), layout, overlay.Brush);
+                rt.Clear(new Color4(0, 0, 0, 0));
+                rt.EndDraw();
             }
         }
         catch { }
@@ -364,7 +584,7 @@ public sealed class Direct2DDanmakuRenderer : IDisposable
                 continue;
             }
 
-            EnsureResources(item, rt);
+            EnsureIcon(item, rt); // text layout was created before the item spawned
             if (x < overlay.Width)
             {
                 DrawDanmaku(item, (float)x, overlay);
@@ -380,27 +600,29 @@ public sealed class Direct2DDanmakuRenderer : IDisposable
         UpdateLayeredWindow(overlay.Hwnd, IntPtr.Zero, ref ptDst, ref size, overlay.MemDC, ref ptSrc, 0, ref blend, 2);
     }
 
-    private void EnsureResources(DanmakuItem item, ID2D1DCRenderTarget rt)
+    private void EnsureTextLayout(DanmakuItem item)
     {
-        if (item.TextLayout == null)
-        {
-            var s = item.Settings;
-            using var format = _dwFactory.CreateTextFormat(
-                s.FontFamilyName, null!,
-                s.Bold ? DWriteFontWeight.Bold : DWriteFontWeight.Normal,
-                DWriteFontStyle.Normal, DWriteFontStretch.Normal,
-                (float)s.FontSize);
+        if (item.TextLayout != null) return;
 
-            item.TextLayout = _dwFactory.CreateTextLayout(
-                item.Text, format, float.MaxValue, (float)s.FontSize * 2);
+        var s = item.Settings;
+        using var format = _dwFactory.CreateTextFormat(
+            s.FontFamilyName, null!,
+            s.Bold ? DWriteFontWeight.Bold : DWriteFontWeight.Normal,
+            DWriteFontStyle.Normal, DWriteFontStretch.Normal,
+            (float)s.FontSize);
 
-            var metrics = item.TextLayout.Metrics;
-            item.TextWidth = metrics.Width;
-            item.TextHeight = metrics.Height;
-            item.TotalWidth = item.TextWidth
-                + (item.IconPng != null ? (float)s.FontSize + 8 : 0) + 20;
-        }
+        item.TextLayout = _dwFactory.CreateTextLayout(
+            item.Text, format, float.MaxValue, (float)s.FontSize * 2);
 
+        var metrics = item.TextLayout.Metrics;
+        item.TextWidth = metrics.Width;
+        item.TextHeight = metrics.Height;
+        item.TotalWidth = item.TextWidth
+            + (item.IconPng != null ? (float)s.FontSize + 8 : 0) + 20;
+    }
+
+    private void EnsureIcon(DanmakuItem item, ID2D1DCRenderTarget rt)
+    {
         if (item.IconBitmap == null && item.IconPng != null)
         {
             try { item.IconBitmap = LoadBitmapFromPng(item.IconPng, rt); }
@@ -468,17 +690,26 @@ public sealed class Direct2DDanmakuRenderer : IDisposable
             new Vector2(textX, textY), item.TextLayout, brush);
     }
 
-    private void AssignTrack(DanmakuItem item, ScreenOverlay overlay)
+    /// <summary>
+    /// Try to place the item on a free track. Returns false when every track is
+    /// occupied and the density setting does not allow overlap — the caller keeps
+    /// the item queued instead of drawing it on top of another danmaku.
+    /// </summary>
+    private static bool TryAssignTrack(DanmakuItem item, ScreenOverlay overlay)
     {
         var s = item.Settings;
-        double trackHeight = s.FontSize + 24;
+        // Line boxes run ~1.3–1.4× the font size; below ~48px the +24 padding covers
+        // that, above it the multiplier keeps neighbouring tracks from overlapping.
+        double trackHeight = Math.Max(s.FontSize + 24, s.FontSize * 1.5);
         int totalTracks = Math.Max(1, (int)(overlay.Height / trackHeight));
         int activeCount = Math.Clamp(
             (int)(totalTracks * (s.DisplayAreaPercent / 100.0)), 1, totalTracks);
 
+        bool allowOverlap = s.Density == 2;
         double minGap = s.Density switch { 1 => 20, 2 => -300, _ => 100 };
         double now = Stopwatch.GetTimestamp();
         double freq = Stopwatch.Frequency;
+        double speed = s.PixelsPerSecond;
 
         var available = new List<int>();
         for (int i = 0; i < activeCount; i++)
@@ -488,20 +719,40 @@ public sealed class Direct2DDanmakuRenderer : IDisposable
             {
                 if (existing.TrackIndex != i) continue;
                 double elapsed = (now - existing.StartTime) / freq;
+                double existingSpeed = existing.Settings.PixelsPerSecond;
                 double rightEdge = existing.SpawnX
-                    - elapsed * existing.Settings.PixelsPerSecond + existing.TotalWidth;
+                    - elapsed * existingSpeed + existing.TotalWidth;
                 if (rightEdge > overlay.Width - minGap) { occupied = true; break; }
+
+                // A faster newcomer must not catch the slower one before its tail exits
+                if (!allowOverlap && speed > existingSpeed && rightEdge > 0 &&
+                    overlay.Width - rightEdge < (speed - existingSpeed) * (rightEdge / existingSpeed))
+                {
+                    occupied = true;
+                    break;
+                }
             }
             if (!occupied) available.Add(i);
         }
 
-        int track = available.Count > 0
-            ? available[Random.Shared.Next(available.Count)]
-            : Random.Shared.Next(0, activeCount);
+        int track;
+        if (available.Count > 0)
+        {
+            track = available[Random.Shared.Next(available.Count)];
+        }
+        else if (allowOverlap)
+        {
+            track = Random.Shared.Next(0, activeCount);
+        }
+        else
+        {
+            return false;
+        }
 
         item.TrackIndex = track;
         item.TrackY = (float)(track * trackHeight);
         item.SpawnX = overlay.Width;
+        return true;
     }
 
     private ID2D1Bitmap? LoadBitmapFromPng(byte[] pngData, ID2D1DCRenderTarget rt)
@@ -518,7 +769,6 @@ public sealed class Direct2DDanmakuRenderer : IDisposable
 
     private sealed class ScreenOverlay : IDisposable
     {
-        public Forms.Screen Screen { get; init; } = null!;
         public IntPtr Hwnd;
         public IntPtr MemDC;
         public IntPtr HBitmap;
@@ -531,6 +781,7 @@ public sealed class Direct2DDanmakuRenderer : IDisposable
         public int OriginY;
         public bool Visible;
         public List<DanmakuItem> Items { get; } = new();
+        public Queue<DanmakuItem> Pending { get; } = new();
 
         public void Dispose()
         {
@@ -553,12 +804,19 @@ public sealed class Direct2DDanmakuRenderer : IDisposable
         }
     }
 
+    private sealed class DanmakuRequest
+    {
+        public string Text { get; init; } = "";
+        public byte[]? IconPng { get; init; }
+        public DanmakuStyleSettings Settings { get; init; } = null!;
+    }
+
     private sealed class DanmakuItem
     {
         public string Text { get; init; } = "";
         public byte[]? IconPng { get; set; }
         public DanmakuStyleSettings Settings { get; init; } = null!;
-        public double StartTime { get; init; }
+        public double StartTime { get; set; } // set when the item leaves the queue
         public double SpawnX { get; set; }
         public int TrackIndex { get; set; }
         public float TrackY { get; set; }
@@ -573,6 +831,8 @@ public sealed class Direct2DDanmakuRenderer : IDisposable
 
     private delegate IntPtr WndProcDelegate(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
 
+    private const uint WM_SETTINGCHANGE = 0x001A;
+    private const uint WM_DISPLAYCHANGE = 0x007E;
     private const uint WS_POPUP = 0x80000000;
     private const uint WS_EX_LAYERED = 0x00080000;
     private const uint WS_EX_TRANSPARENT = 0x00000020;
@@ -696,8 +956,15 @@ public sealed class Direct2DDanmakuRenderer : IDisposable
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
     private static extern IntPtr GetModuleHandleW(string? lpModuleName);
 
-    private static IntPtr WndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam)
-        => DefWindowProcW(hWnd, msg, wParam, lParam);
+    private IntPtr WndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam)
+    {
+        // Resolution / monitor / work-area changes: resync overlays on the next frame
+        if (msg == WM_DISPLAYCHANGE || msg == WM_SETTINGCHANGE)
+        {
+            _displayChanged = true;
+        }
+        return DefWindowProcW(hWnd, msg, wParam, lParam);
+    }
 
     #endregion
 }

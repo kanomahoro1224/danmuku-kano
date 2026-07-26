@@ -28,7 +28,8 @@
   <data name="TextDensityOverlap" xml:space="preserve"><value>重疊</value></data>
   <data name="TextDisplayScreen" xml:space="preserve"><value>顯示螢幕</value></data>
   <data name="TextScreenPrimary" xml:space="preserve"><value>僅主螢幕</value></data>
-  <data name="TextScreenAll" xml:space="preserve"><value>所有螢幕</value></data>
+  <data name="TextScreenAll" xml:space="preserve"><value>所有螢幕（複製顯示）</value></data>
+  <data name="TextScreenSpan" xml:space="preserve"><value>跨螢幕銜接顯示</value></data>
   <data name="TextScreenMouse" xml:space="preserve"><value>滑鼠所在螢幕</value></data>
   <data name="TextFontAndColor" xml:space="preserve"><value>顏色與字體</value></data>
   <data name="TextDefaultFont" xml:space="preserve"><value>預設字體</value></data>

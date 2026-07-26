@@ -28,7 +28,8 @@
   <data name="TextDensityOverlap" xml:space="preserve"><value>重なり許可</value></data>
   <data name="TextDisplayScreen" xml:space="preserve"><value>表示画面</value></data>
   <data name="TextScreenPrimary" xml:space="preserve"><value>プライマリのみ</value></data>
-  <data name="TextScreenAll" xml:space="preserve"><value>すべての画面</value></data>
+  <data name="TextScreenAll" xml:space="preserve"><value>すべての画面（複製）</value></data>
+  <data name="TextScreenSpan" xml:space="preserve"><value>画面をまたいで表示</value></data>
   <data name="TextScreenMouse" xml:space="preserve"><value>マウスのある画面</value></data>
   <data name="TextFontAndColor" xml:space="preserve"><value>色とフォント</value></data>
   <data name="TextDefaultFont" xml:space="preserve"><value>デフォルト</value></data>

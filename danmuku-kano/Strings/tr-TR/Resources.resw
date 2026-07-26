@@ -28,7 +28,8 @@
   <data name="TextDensityOverlap" xml:space="preserve"><value>Üst üste binme</value></data>
   <data name="TextDisplayScreen" xml:space="preserve"><value>Görüntüleme ekranı</value></data>
   <data name="TextScreenPrimary" xml:space="preserve"><value>Sadece birincil ekran</value></data>
-  <data name="TextScreenAll" xml:space="preserve"><value>Tüm ekranlar</value></data>
+  <data name="TextScreenAll" xml:space="preserve"><value>Tüm ekranlar (yinele)</value></data>
+  <data name="TextScreenSpan" xml:space="preserve"><value>Ekranlar arası kesintisiz</value></data>
   <data name="TextScreenMouse" xml:space="preserve"><value>Fare imleci ekranı</value></data>
   <data name="TextFontAndColor" xml:space="preserve"><value>Renk ve yazı tipi</value></data>
   <data name="TextDefaultFont" xml:space="preserve"><value>Varsayılan yazı tipi</value></data>

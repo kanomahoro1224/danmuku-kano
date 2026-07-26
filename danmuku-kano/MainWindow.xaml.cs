@@ -200,7 +200,7 @@ public sealed partial class MainWindow : Window
         Services.SettingsService.Set("Opacity", OpacitySlider.Value);
         Services.SettingsService.Set("DisplayArea", DisplayAreaSlider.Value);
         Services.SettingsService.Set("Density", DensityNormal.IsChecked == true ? 0 : (DensityMore.IsChecked == true ? 1 : 2));
-        Services.SettingsService.Set("DisplayScreenMode", ScreenPrimary.IsChecked == true ? 0 : (ScreenAll.IsChecked == true ? 1 : 2));
+        Services.SettingsService.Set("DisplayScreenMode", ScreenPrimary.IsChecked == true ? 0 : (ScreenAll.IsChecked == true ? 1 : (ScreenSpan.IsChecked == true ? 3 : 2)));
         Services.SettingsService.Set("FontFamilyName", GetSelectedFontFamilyName());
         
         var color = DanmakuColor.Color;
@@ -396,6 +396,7 @@ public sealed partial class MainWindow : Window
             int screenMode = Services.SettingsService.Get<int>("DisplayScreenMode", 0);
             if (screenMode == 0) ScreenPrimary.IsChecked = true;
             else if (screenMode == 1) ScreenAll.IsChecked = true;
+            else if (screenMode == 3) ScreenSpan.IsChecked = true;
             else ScreenMouse.IsChecked = true;
 
             string? selectedFontName = Services.SettingsService.Get<string>("FontFamilyName");
@@ -461,6 +462,7 @@ public sealed partial class MainWindow : Window
         DensityOverlap.Checked += (s,e) => SaveSettings();
         ScreenPrimary.Checked += (s,e) => SaveSettings();
         ScreenAll.Checked += (s,e) => SaveSettings();
+        ScreenSpan.Checked += (s,e) => SaveSettings();
         ScreenMouse.Checked += (s,e) => SaveSettings();
         FontFamilyCombo.SelectionChanged += (s,e) => SaveSettings();
         DanmakuColor.ColorChanged += (s,e) => SaveSettings();
@@ -592,7 +594,7 @@ public sealed partial class MainWindow : Window
     {
         var settings = DanmakuStyleSettings.Load();
         string text = $"{LocalizationService.Instance.TestNotificationAppName}: {LocalizationService.Instance.TestNotificationTitle} {LocalizationService.Instance.TestNotificationMessagePrefix} - {DateTime.Now:HH:mm:ss}";
-        _renderer.ShowDanmaku(text, null, settings, System.Windows.Forms.Screen.PrimaryScreen);
+        _renderer.ShowDanmaku(text, null, settings);
     }
 
     private async void OnNewDanmaku(damuku_kano.Models.NotificationItem item)
@@ -616,17 +618,6 @@ public sealed partial class MainWindow : Window
         }
 
         var settings = DanmakuStyleSettings.Load();
-        _renderer.ShowDanmaku(text, iconPng, settings, System.Windows.Forms.Screen.PrimaryScreen);
-    }
-
-    private static System.Windows.Forms.Screen? ResolveTargetScreen(int mode)
-    {
-        return mode switch
-        {
-            0 => System.Windows.Forms.Screen.PrimaryScreen,
-            1 => null, // null = all screens
-            2 => System.Windows.Forms.Screen.FromPoint(System.Windows.Forms.Cursor.Position),
-            _ => System.Windows.Forms.Screen.PrimaryScreen
-        };
+        _renderer.ShowDanmaku(text, iconPng, settings);
     }
 }
