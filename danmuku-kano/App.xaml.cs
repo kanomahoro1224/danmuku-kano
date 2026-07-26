@@ -35,6 +35,8 @@ namespace damuku_kano
         /// </summary>
         public App()
         {
+            CrashLog.Write("App starting");
+
             UnhandledException += (s, e) =>
             {
                 CrashLog.Write("XAML UnhandledException", e.Exception);
