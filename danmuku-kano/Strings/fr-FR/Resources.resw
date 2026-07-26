@@ -15,9 +15,6 @@
   <data name="AppTitle" xml:space="preserve"><value>Kano Notification Danmaku</value></data>
   <data name="NavStyle" xml:space="preserve"><value>Style des danmakus</value></data>
   <data name="NavHistory" xml:space="preserve"><value>Historique des notifications</value></data>
-  <data name="TextProjectBasedOn" xml:space="preserve"><value>Ce projet est basé sur Windows App SDK (WinUI 3).</value></data>
-  <data name="TextNoNativeTransparency" xml:space="preserve"><value>WinUI 3 ne prend pas encore en charge nativement les fenêtres transparentes sans bordure,</value></data>
-  <data name="TextComplexHooks" xml:space="preserve"><value>le rendu des danmakus est géré par une couche WPF transparente dédiée, qui continue de fonctionner même après la fermeture de la fenêtre principale.</value></data>
   <data name="TextFontSize" xml:space="preserve"><value>Taille de police (%)</value></data>
   <data name="TextSpeed" xml:space="preserve"><value>Vitesse des danmakus</value></data>
   <data name="TextOpacity" xml:space="preserve"><value>Opacité (%)</value></data>

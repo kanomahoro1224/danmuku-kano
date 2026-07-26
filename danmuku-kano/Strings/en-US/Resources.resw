@@ -15,9 +15,6 @@
   <data name="AppTitle" xml:space="preserve"><value>Kano Danmaku Notification</value></data>
   <data name="NavStyle" xml:space="preserve"><value>Danmaku Style</value></data>
   <data name="NavHistory" xml:space="preserve"><value>History</value></data>
-  <data name="TextProjectBasedOn" xml:space="preserve"><value>Built on Windows App SDK (WinUI 3).</value></data>
-  <data name="TextNoNativeTransparency" xml:space="preserve"><value>WinUI 3 still does not provide a native transparent borderless window,</value></data>
-  <data name="TextComplexHooks" xml:space="preserve"><value>so danmaku rendering now runs in a dedicated WPF transparent host and keeps working after the main UI closes.</value></data>
   <data name="TextFontSize" xml:space="preserve"><value>Font Size (%)</value></data>
   <data name="TextSpeed" xml:space="preserve"><value>Danmaku Speed</value></data>
   <data name="TextOpacity" xml:space="preserve"><value>Opacity (%)</value></data>

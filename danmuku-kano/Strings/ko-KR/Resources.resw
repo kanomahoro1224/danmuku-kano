@@ -15,9 +15,6 @@
   <data name="AppTitle" xml:space="preserve"><value>Kano 탄막 알림</value></data>
   <data name="NavStyle" xml:space="preserve"><value>탄막 스타일</value></data>
   <data name="NavHistory" xml:space="preserve"><value>알림 기록</value></data>
-  <data name="TextProjectBasedOn" xml:space="preserve"><value>이 프로젝트는 Windows App SDK (WinUI 3) 기반입니다.</value></data>
-  <data name="TextNoNativeTransparency" xml:space="preserve"><value>WinUI 3은 현재 투명한 테두리 없는 창을 기본 지원하지 않아,</value></data>
-  <data name="TextComplexHooks" xml:space="preserve"><value>탄막 렌더링은 별도의 WPF 투명 호스트 레이어에서 처리하며, 메인 창을 닫아도 계속 작동합니다.</value></data>
   <data name="TextFontSize" xml:space="preserve"><value>글꼴 크기(%)</value></data>
   <data name="TextSpeed" xml:space="preserve"><value>탄막 속도</value></data>
   <data name="TextOpacity" xml:space="preserve"><value>불투명도(%)</value></data>
