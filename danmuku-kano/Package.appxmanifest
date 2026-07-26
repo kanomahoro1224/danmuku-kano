@@ -13,7 +13,7 @@
   <Identity
     Name="Official.Kano"
     Publisher="CN=3B84F6A6-A22D-4FDD-B37F-BC22D607430A"
-    Version="1.12.0.0" />
+    Version="2.0.0.0" />
 
   <mp:PhoneIdentity PhoneProductId="bb9befb1-431b-4290-8a81-46d15f3e8b56" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
