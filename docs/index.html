@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Kano 弹幕通知 — 将 Windows 系统通知变成飞过屏幕的弹幕。免费、开源、支持多显示器。">
+<title>Kano 弹幕通知 — 让消息飞过你的屏幕</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23ffb7d5'/%3E%3Ctext x='50' y='66' font-size='46' text-anchor='middle'%3E🎀%3C/text%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #fff7fb;
+    --bg2: #f2e9ff;
+    --ink: #4a3656;
+    --ink-soft: #8a7399;
+    --pink: #ff7ab8;
+    --pink-deep: #f05a9e;
+    --purple: #9b6cf5;
+    --blue: #5aa7ff;
+    --mint: #4dd8b0;
+    --card: #ffffff;
+    --line: #f0dce9;
+    --shadow: 0 12px 40px rgba(240, 90, 158, .12);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+                 "Hiragino Sans GB", "Microsoft YaHei", Roboto, sans-serif;
+    background:
+      radial-gradient(900px 500px at 12% -5%, #ffe4f1 0%, transparent 60%),
+      radial-gradient(800px 500px at 90% 10%, #e9ddff 0%, transparent 60%),
+      linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
+    background-attachment: fixed;
+    color: var(--ink);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ---------- 装饰浮云 ---------- */
+  .cloud {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(40px);
+    opacity: .55;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .cloud.c1 { width: 340px; height: 340px; background: #ffd1e8; top: -90px; left: -90px; }
+  .cloud.c2 { width: 300px; height: 300px; background: #dccbff; top: 30%; right: -110px; }
+  .cloud.c3 { width: 260px; height: 260px; background: #cdeaff; bottom: 8%; left: -80px; }
+
+  header, main, footer { position: relative; z-index: 1; }
+
+  /* ---------- 顶部导航 ---------- */
+  header {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 24px 32px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.15rem; }
+  .brand .logo { width: 36px; height: 36px; }
+  .nav-right { display: flex; align-items: center; gap: 12px; }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 999px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    font-size: .95rem;
+    transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+  }
+  .btn:hover { transform: translateY(-2px); }
+  .btn:active { transform: translateY(0); }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--pink) 0%, var(--purple) 100%);
+    color: #fff;
+    padding: 12px 28px;
+    box-shadow: 0 8px 24px rgba(240, 90, 158, .35);
+  }
+  .btn-primary:hover { box-shadow: 0 12px 32px rgba(240, 90, 158, .45); }
+  .btn-ghost {
+    background: #fff;
+    color: var(--pink-deep);
+    padding: 10px 20px;
+    border: 2px solid var(--line);
+  }
+  .btn-ghost:hover { border-color: var(--pink); background: #fff5fa; }
+  .lang-switch {
+    background: #fff;
+    color: var(--ink-soft);
+    border: 2px solid var(--line);
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-size: .9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color .2s ease, color .2s ease;
+  }
+  .lang-switch:hover { border-color: var(--pink); color: var(--pink-deep); }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 96px 32px 32px;
+    text-align: center;
+  }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    border: 2px solid var(--line);
+    border-radius: 999px;
+    padding: 8px 18px;
+    font-size: .9rem;
+    font-weight: 600;
+    color: var(--ink-soft);
+    margin-bottom: 28px;
+    animation: rise .7s ease both;
+  }
+  .hero h1 {
+    font-size: clamp(2.6rem, 6vw, 4.4rem);
+    line-height: 1.15;
+    letter-spacing: .01em;
+    margin-bottom: 20px;
+    animation: rise .7s .08s ease both;
+  }
+  .hero h1 .grad {
+    background: linear-gradient(120deg, var(--pink-deep) 0%, var(--purple) 60%, var(--blue) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .hero p.sub {
+    font-size: 1.2rem;
+    color: var(--ink-soft);
+    max-width: 620px;
+    margin: 0 auto 36px;
+    animation: rise .7s .16s ease both;
+  }
+  .hero .cta { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; animation: rise .7s .24s ease both; }
+  .hero .note { margin-top: 14px; font-size: .85rem; color: var(--ink-soft); animation: rise .7s .3s ease both; }
+
+  /* ---------- 弹幕演示 ---------- */
+  .demo {
+    margin: 56px auto 24px;
+    padding: 0 16px;
+    animation: rise .8s .4s ease both;
+  }
+  .demo-frame {
+    max-width: 980px;
+    margin: 0 auto;
+    background: linear-gradient(180deg, #191336 0%, #241b4d 55%, #32246b 100%);
+    border-radius: 24px;
+    border: 6px solid #fff;
+    box-shadow: var(--shadow), 0 0 0 8px rgba(240, 90, 158, .08);
+    overflow: hidden;
+    position: relative;
+  }
+  .demo-inner { height: 320px; position: relative; }
+  .video-stub {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: rgba(255, 255, 255, .55);
+    font-size: .95rem;
+    letter-spacing: .08em;
+  }
+  .video-stub .kawaii { font-size: 2.2rem; }
+  .demo-inner canvas { position: absolute; inset: 0; }
+
+  /* ---------- 内容区 ---------- */
+  main { max-width: 1120px; margin: 0 auto; padding: 24px 32px 80px; }
+  .section-title {
+    text-align: center;
+    font-size: clamp(1.8rem, 3.5vw, 2.4rem);
+    margin: 72px 0 40px;
+    position: relative;
+  }
+  .section-title .deco {
+    position: absolute;
+    left: 50%;
+    bottom: -14px;
+    transform: translateX(-50%);
+    font-size: 1.2rem;
+    letter-spacing: .3em;
+    opacity: .7;
+  }
+
+  .features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 24px;
+  }
+  .card {
+    background: var(--card);
+    border: 2px solid var(--line);
+    border-radius: 20px;
+    padding: 28px 24px;
+    box-shadow: 0 4px 20px rgba(90, 60, 120, .06);
+    transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+  }
+  .card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow);
+    border-color: var(--pink);
+  }
+  .card .icon { font-size: 2.2rem; margin-bottom: 14px; display: block; }
+  .card h3 { font-size: 1.15rem; margin-bottom: 10px; }
+  .card p { font-size: .95rem; color: var(--ink-soft); }
+
+  .wide { grid-column: 1 / -1; }
+
+  /* ---------- 底部 CTA ---------- */
+  .cta-band {
+    text-align: center;
+    background: linear-gradient(135deg, #ffd9ec 0%, #e6d9ff 100%);
+    border: 2px solid #fff;
+    border-radius: 28px;
+    padding: 56px 32px;
+    margin-top: 80px;
+    box-shadow: var(--shadow);
+  }
+  .cta-band h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); margin-bottom: 14px; }
+  .cta-band p { color: var(--ink-soft); margin-bottom: 28px; }
+  .cta-band .btn { font-size: 1.05rem; padding: 14px 36px; }
+
+  footer {
+    text-align: center;
+    padding: 40px 24px 56px;
+    color: var(--ink-soft);
+    font-size: .9rem;
+  }
+  footer a { color: var(--pink-deep); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+  footer .foot-links { display: flex; gap: 20px; justify-content: center; margin-top: 12px; flex-wrap: wrap; }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 640px) {
+    header { padding: 16px 16px 0; }
+    .hero { padding: 64px 16px 24px; }
+    .demo-inner { height: 240px; }
+    main { padding: 16px 16px 64px; }
+    .brand span { display: none; }
+    .hero .cta { flex-direction: column; align-items: center; }
+    .btn-primary { width: 100%; max-width: 320px; }
+  }
+</style>
+</head>
+<body>
+<div class="cloud c1"></div>
+<div class="cloud c2"></div>
+<div class="cloud c3"></div>
+
+<header>
+  <div class="brand">
+    <svg class="logo" viewBox="0 0 100 100" aria-hidden="true">
+      <rect width="100" height="100" rx="22" fill="#ffb7d5"/>
+      <circle cx="50" cy="50" r="30" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-dasharray="60 200"/>
+      <circle cx="50" cy="50" r="12" fill="#9b6cf5"/>
+    </svg>
+    <span>Kano 弹幕通知</span>
+  </div>
+  <div class="nav-right">
+    <a class="btn btn-ghost" href="#features" data-i18n="nav_features">功能</a>
+    <a class="btn btn-ghost" href="https://github.com/kanomahoro1224/danmuku-kano" target="_blank" rel="noopener">GitHub</a>
+    <button class="lang-switch" id="langBtn" type="button" aria-label="Switch language">EN</button>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-badge"><span data-i18n="badge">✨</span><span data-i18n="badge_text">免费 · 开源 · 支持多显示器</span></div>
+  <h1><span data-i18n="hero_1">让消息</span><br><span class="grad" data-i18n="hero_2">飞过你的屏幕</span><span data-i18n="hero_3"> 🎀</span></h1>
+  <p class="sub" data-i18n="hero_sub">把 Windows 系统通知变成漂亮的弹幕。微信、邮件、任何应用的通知，都能以你的风格飘过屏幕——玩游戏、看视频、全屏直播都不错过。</p>
+  <div class="cta">
+    <a class="btn btn-primary" href="https://apps.microsoft.com/detail/9pl8ckd2ffp3" target="_blank" rel="noopener">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.5 2 3 5.7v8.8l8.5-1.3V2Zm1 0v11.2L21 14.5V5.7L12.5 2ZM3 16.2V21l8.5-1.4v-4.7L3 16.2Zm9.5-1.2v4.7L21 21v-4.8l-8.5-1.2Z"/></svg>
+      <span data-i18n="download">免费下载</span>
+    </a>
+    <a class="btn btn-ghost" href="https://github.com/kanomahoro1224/danmuku-kano" target="_blank" rel="noopener">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.15-1.11-1.46-1.11-1.46-.9-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.89 1.52 2.34 1.08 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02a9.58 9.58 0 0 1 5 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10 10 0 0 0 12 2Z"/></svg>
+      <span data-i18n="github">GitHub</span>
+    </a>
+  </div>
+  <p class="note" data-i18n="note">免费使用 · 无广告 · 从 Microsoft Store 一键安装</p>
+</section>
+
+<section class="demo" aria-label="弹幕演示">
+  <div class="demo-frame">
+    <div class="demo-inner">
+      <div class="video-stub">
+        <span class="kawaii">(◕‿◕)</span>
+        <span data-i18n="demo_label">正在播放：你的屏幕</span>
+      </div>
+      <canvas id="danmaku" aria-hidden="true"></canvas>
+    </div>
+  </div>
+</section>
+
+<main>
+  <section id="features">
+    <h2 class="section-title" data-i18n="features_title">为什么选择 Kano？<span class="deco" data-i18n="features_deco">🎀 ✨ 🌸</span></h2>
+    <div class="features">
+      <div class="card">
+        <span class="icon">⚡</span>
+        <h3 data-i18n="f1_t">Direct2D 硬件加速</h3>
+        <p data-i18n="f1_p">弹幕由 GPU 直接绘制，顺滑不掉帧。无弹幕时自动暂停渲染，对游戏帧率几乎零影响。</p>
+      </div>
+      <div class="card">
+        <span class="icon">🖥️</span>
+        <h3 data-i18n="f2_t">多显示器全支持</h3>
+        <p data-i18n="f2_p">弹幕可以只显示在主屏、跟随鼠标所在屏幕，或者铺满所有显示器——多屏玩家的福音。</p>
+      </div>
+      <div class="card">
+        <span class="icon">🎨</span>
+        <h3 data-i18n="f3_t">弹幕随心定制</h3>
+        <p data-i18n="f3_p">字体、大小、颜色、速度、密度、透明度……每一条弹幕都可以是独一无二的风格。</p>
+      </div>
+      <div class="card">
+        <span class="icon">🔔</span>
+        <h3 data-i18n="f4_t">什么通知都能弹</h3>
+        <p data-i18n="f4_p">微信、邮件、系统提醒……任何应用的通知都会变成弹幕，全屏游戏和视频也不错过消息。</p>
+      </div>
+      <div class="card">
+        <span class="icon">🌏</span>
+        <h3 data-i18n="f5_t">12 种语言</h3>
+        <p data-i18n="f5_p">简体中文、繁體中文、English、日本語、한국어…… 界面自动适配你的系统语言。</p>
+      </div>
+      <div class="card">
+        <span class="icon">🪶</span>
+        <h3 data-i18n="f6_t">轻量小巧</h3>
+        <p data-i18n="f6_p">专注一件事并做到极致。常驻后台不打扰，托盘图标随时唤出设置。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-band">
+    <h2 data-i18n="cta_t">准备好让消息飞起来了吗？</h2>
+    <p data-i18n="cta_p">免费、开源、无广告。从 Microsoft Store 一键安装。</p>
+    <a class="btn btn-primary" href="https://apps.microsoft.com/detail/9pl8ckd2ffp3" target="_blank" rel="noopener">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.5 2 3 5.7v8.8l8.5-1.3V2Zm1 0v11.2L21 14.5V5.7L12.5 2ZM3 16.2V21l8.5-1.4v-4.7L3 16.2Zm9.5-1.2v4.7L21 21v-4.8l-8.5-1.2Z"/></svg>
+      <span data-i18n="cta_btn">免费下载</span>
+    </a>
+  </section>
+</main>
+
+<footer>
+  <div class="foot-links">
+    <a href="https://github.com/kanomahoro1224/danmuku-kano" target="_blank" rel="noopener">GitHub</a>
+    <a href="https://apps.microsoft.com/detail/9pl8ckd2ffp3" target="_blank" rel="noopener" data-i18n="foot_store">Microsoft Store</a>
+  </div>
+  <p style="margin-top:16px">© 2026 Kano 弹幕通知 · <span data-i18n="foot_by">鹿可可Official</span></p>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ============ 中英双语 ============ */
+  const I18N = {
+    "zh-CN": {
+      nav_features: "功能",
+      badge_text: "免费 · 开源 · 支持多显示器",
+      hero_1: "让消息",
+      hero_2: "飞过你的屏幕",
+      hero_3: " 🎀",
+      hero_sub: "把 Windows 系统通知变成漂亮的弹幕。微信、邮件、任何应用的通知，都能以你的风格飘过屏幕——玩游戏、看视频、全屏直播都不错过。",
+      download: "免费下载",
+      github: "GitHub",
+      note: "免费使用 · 无广告 · 从 Microsoft Store 一键安装",
+      demo_label: "正在播放：你的屏幕",
+      features_title: "为什么选择 Kano？",
+      features_deco: "🎀 ✨ 🌸",
+      f1_t: "Direct2D 硬件加速",
+      f1_p: "弹幕由 GPU 直接绘制，顺滑不掉帧。无弹幕时自动暂停渲染，对游戏帧率几乎零影响。",
+      f2_t: "多显示器全支持",
+      f2_p: "弹幕可以只显示在主屏、跟随鼠标所在屏幕，或者铺满所有显示器——多屏玩家的福音。",
+      f3_t: "弹幕随心定制",
+      f3_p: "字体、大小、颜色、速度、密度、透明度……每一条弹幕都可以是独一无二的风格。",
+      f4_t: "什么通知都能弹",
+      f4_p: "微信、邮件、系统提醒……任何应用的通知都会变成弹幕，全屏游戏和视频也不错过消息。",
+      f5_t: "12 种语言",
+      f5_p: "简体中文、繁體中文、English、日本語、한국어…… 界面自动适配你的系统语言。",
+      f6_t: "轻量小巧",
+      f6_p: "专注一件事并做到极致。常驻后台不打扰，托盘图标随时唤出设置。",
+      cta_t: "准备好让消息飞起来了吗？",
+      cta_p: "免费、开源、无广告。从 Microsoft Store 一键安装。",
+      cta_btn: "免费下载",
+      foot_store: "Microsoft Store",
+      foot_by: "鹿可可Official"
+    },
+    en: {
+      nav_features: "Features",
+      badge_text: "Free · Open Source · Multi-monitor",
+      hero_1: "Let messages",
+      hero_2: "fly across your screen",
+      hero_3: " 🎀",
+      hero_sub: "Turn Windows notifications into beautiful danmaku. WeChat, emails, any app's notifications float across your screen in your own style — never miss a thing while gaming, watching videos, or in fullscreen.",
+      download: "Get it free",
+      github: "GitHub",
+      note: "Free to use · No ads · One-click install from Microsoft Store",
+      demo_label: "Now playing: your screen",
+      features_title: "Why Kano?",
+      features_deco: "🎀 ✨ 🌸",
+      f1_t: "Direct2D GPU rendering",
+      f1_p: "Danmaku is drawn directly by the GPU — silky smooth with zero frame drops. Rendering auto-pauses when idle, so your game's FPS stays untouched.",
+      f2_t: "Full multi-monitor support",
+      f2_p: "Show danmaku on your main screen, follow your mouse across displays, or fill every monitor — a blessing for multi-screen setups.",
+      f3_t: "Fully customizable",
+      f3_p: "Font, size, color, speed, density, opacity… every danmaku can be styled exactly the way you like.",
+      f4_t: "Any notification, danmaku-fied",
+      f4_p: "WeChat, mail, system alerts… notifications from any app become danmaku. Never miss a message in fullscreen games or videos.",
+      f5_t: "12 languages",
+      f5_p: "简体中文, 繁體中文, English, 日本語, 한국어… the UI adapts to your system language automatically.",
+      f6_t: "Lightweight & quiet",
+      f6_p: "It does one thing, and does it well. Lives quietly in the tray — one click brings up settings anytime.",
+      cta_t: "Ready to let messages fly?",
+      cta_p: "Free, open source, ad-free. One-click install from the Microsoft Store.",
+      cta_btn: "Get it free",
+      foot_store: "Microsoft Store",
+      foot_by: "鹿可可Official"
+    }
+  };
+
+  let lang = /^zh/i.test(navigator.language || "") ? "zh-CN" : "en";
+
+  function applyLang() {
+    document.documentElement.lang = lang === "zh-CN" ? "zh-CN" : "en";
+    document.querySelectorAll("[data-i18n]").forEach(function (el) {
+      const key = el.getAttribute("data-i18n");
+      if (I18N[lang][key] !== undefined) el.textContent = I18N[lang][key];
+    });
+    document.getElementById("langBtn").textContent = lang === "zh-CN" ? "EN" : "中";
+  }
+  document.getElementById("langBtn").addEventListener("click", function () {
+    lang = lang === "zh-CN" ? "en" : "zh-CN";
+    applyLang();
+  });
+
+  /* ============ 弹幕演示动画 ============ */
+  const canvas = document.getElementById("danmaku");
+  const ctx = canvas.getContext("2d");
+  const COLORS = ["#ff7ab8", "#9b6cf5", "#5aa7ff", "#4dd8b0", "#ffd166", "#ff8fa3", "#7bd8ff"];
+  const FONT_FAM = '"Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif';
+  let W = 0, H = 0, DPR = 1, rafId = 0;
+  const danmaku = [];
+
+  const SAMPLE_POOL = {
+    "zh-CN": [
+      ["鹿可可", "今天也要元气满满哦~"],
+      ["小明", "这个弹幕好可爱！"],
+      ["打工仔", "老板的消息也能变弹幕 233"],
+      ["游戏宅", "全屏打游戏也不错过微信了！"],
+      ["猫猫", "喵~ 通知弹幕化！"],
+      ["路人甲", "多屏玩家狂喜"],
+      ["夜猫子", "12 种语言太强了吧"],
+      ["鹿可可", "从 Microsoft Store 免费下载~"]
+    ],
+    en: [
+      ["Kano", "Notifications, but make them cute!"],
+      ["Gamer", "Fullscreen gaming, zero missed DMs"],
+      ["Dev", "GPU rendered and open source ♥"],
+      ["Cat", "meow~ danmaku everywhere"],
+      ["Streamer", "Chat alerts over my stream, love it"],
+      ["NightOwl", "12 languages? Incredible."],
+      ["User", "My dual monitors say thanks"],
+      ["Kano", "Free on the Microsoft Store!"]
+    ]
+  };
+
+  function resize() {
+    const inner = canvas.parentElement;
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    W = inner.clientWidth;
+    H = inner.clientHeight;
+    canvas.width = Math.round(W * DPR);
+    canvas.height = Math.round(H * DPR);
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
+
+  function spawn() {
+    const pool = SAMPLE_POOL[lang] || SAMPLE_POOL["zh-CN"];
+    const [user, text] = pool[Math.floor(Math.random() * pool.length)];
+    const size = 15 + Math.random() * 7;
+    ctx.font = "600 " + size + "px " + FONT_FAM;
+    const tw = ctx.measureText(user + " : " + text).width + 24;
+    const y = Math.random() * (H - 44) + 22;
+    danmaku.push({
+      text, user,
+      x: W + 40,
+      y,
+      size,
+      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+      speed: 130 + Math.random() * 110,
+      tw
+    });
+  }
+
+  function drawRounded(ctx2, x, y, w, h, r) {
+    ctx2.beginPath();
+    ctx2.moveTo(x + r, y);
+    ctx2.arcTo(x + w, y, x + w, y + h, r);
+    ctx2.arcTo(x + w, y + h, x, y + h, r);
+    ctx2.arcTo(x, y + h, x, y, r);
+    ctx2.arcTo(x, y, x + w, y, r);
+    ctx2.closePath();
+  }
+
+  function step(ts) {
+    if (!W || !H) { rafId = requestAnimationFrame(step); return; }
+    ctx.clearRect(0, 0, W, H);
+    const dt = Math.min((ts - (step.last || ts)) / 1000, 0.05);
+    step.last = ts;
+
+    danmaku.forEach(function (d) { d.x -= d.speed * dt; });
+    for (let i = danmaku.length - 1; i >= 0; i--) {
+      if (danmaku[i].x + danmaku[i].tw < -20) danmaku.splice(i, 1);
+    }
+    if (danmaku.length < 4 && Math.random() < 0.025) spawn();
+
+    danmaku.forEach(function (d) {
+      const px = d.x, py = d.y - d.size / 2 - 6;
+      const h = d.size + 12;
+      drawRounded(ctx, px, py, d.tw, h, h / 2);
+      ctx.fillStyle = "rgba(0,0,0,0.35)";
+      ctx.fill();
+      ctx.fillStyle = d.color;
+      ctx.font = "600 " + d.size + "px " + FONT_FAM;
+      ctx.textBaseline = "middle";
+      ctx.fillText(d.user + " : " + d.text, px + 12, py + h / 2);
+    });
+    rafId = requestAnimationFrame(step);
+  }
+
+  function start() {
+    if (rafId) cancelAnimationFrame(rafId);
+    danmaku.length = 0;
+    resize();
+    for (let i = 0; i < 3; i++) spawn();
+    rafId = requestAnimationFrame(step);
+  }
+
+  window.addEventListener("resize", start);
+  if (document.visibilityState === "visible") start();
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "visible") start();
+    else if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+  });
+
+  applyLang();
+})();
+</script>
+</body>
+</html>
