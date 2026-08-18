@@ -88,4 +88,5 @@
   <data name="TextPerfBalanced" xml:space="preserve"><value>均衡（最高 60 帧）</value></data>
   <data name="TextPerfGame" xml:space="preserve"><value>游戏（最高 30 帧，优先保证游戏帧率）</value></data>
   <data name="TextPerfEco" xml:space="preserve"><value>省电（最高 15 帧）</value></data>
+  <data name="TextMaxNotificationLength" xml:space="preserve"><value>通知最大字数</value></data>
 </root>

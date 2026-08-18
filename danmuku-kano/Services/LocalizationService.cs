@@ -20,6 +20,7 @@ public sealed class LocalizationService : INotifyPropertyChanged
     public string TextSpeed => GetString(nameof(TextSpeed));
     public string TextOpacity => GetString(nameof(TextOpacity));
     public string TextDisplayArea => GetString(nameof(TextDisplayArea));
+    public string TextMaxNotificationLength => GetString(nameof(TextMaxNotificationLength));
     public string TextDensity => GetString(nameof(TextDensity));
     public string TextDensityNormal => GetString(nameof(TextDensityNormal));
     public string TextDensityMore => GetString(nameof(TextDensityMore));

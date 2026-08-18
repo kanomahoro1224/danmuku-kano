@@ -88,4 +88,5 @@
   <data name="TextPerfBalanced" xml:space="preserve"><value>Ausgewogen (max. 60 FPS)</value></data>
   <data name="TextPerfGame" xml:space="preserve"><value>Spiele (max. 30 FPS, Spiel hat Vorrang)</value></data>
   <data name="TextPerfEco" xml:space="preserve"><value>Energiesparen (max. 15 FPS)</value></data>
+  <data name="TextMaxNotificationLength" xml:space="preserve"><value>Maximale Benachrichtigungslänge</value></data>
 </root>

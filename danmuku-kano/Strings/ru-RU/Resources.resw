@@ -88,4 +88,5 @@
   <data name="TextPerfBalanced" xml:space="preserve"><value>Сбалансированный (до 60 кадров/с)</value></data>
   <data name="TextPerfGame" xml:space="preserve"><value>Игровой (до 30 кадров/с, приоритет игре)</value></data>
   <data name="TextPerfEco" xml:space="preserve"><value>Энергосбережение (до 15 кадров/с)</value></data>
+  <data name="TextMaxNotificationLength" xml:space="preserve"><value>Максимальная длина уведомления</value></data>
 </root>

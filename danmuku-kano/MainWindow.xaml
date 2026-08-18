@@ -51,6 +51,11 @@
                     <TextBlock Text="{x:Bind services:LocalizationService.Instance.TextDisplayArea, Mode=OneWay}" Margin="0,12,0,4"/>
                     <Slider x:Name="DisplayAreaSlider" Minimum="10" Maximum="100" Value="100" Width="300" HorizontalAlignment="Left"/>
 
+                    <NumberBox x:Name="MaxNotificationLengthBox"
+                               Header="{x:Bind services:LocalizationService.Instance.TextMaxNotificationLength, Mode=OneWay}"
+                               Minimum="1" Maximum="999" Value="30" SpinButtonPlacementMode="Compact"
+                               Width="160" HorizontalAlignment="Left" Margin="0,12,0,0"/>
+
                     <TextBlock Text="{x:Bind services:LocalizationService.Instance.TextDensity, Mode=OneWay}" Margin="0,12,0,4"/>
                     <StackPanel Orientation="Horizontal" Spacing="4">
                         <RadioButton x:Name="DensityNormal" Content="{x:Bind services:LocalizationService.Instance.TextDensityNormal, Mode=OneWay}" IsChecked="True" GroupName="Density"/>

@@ -199,6 +199,10 @@ public sealed partial class MainWindow : Window
         Services.SettingsService.Set("Speed", SpeedSlider.Value);
         Services.SettingsService.Set("Opacity", OpacitySlider.Value);
         Services.SettingsService.Set("DisplayArea", DisplayAreaSlider.Value);
+        if (!double.IsNaN(MaxNotificationLengthBox.Value))
+        {
+            Services.SettingsService.Set("MaxNotificationLength", Math.Clamp((int)MaxNotificationLengthBox.Value, 1, 999));
+        }
         Services.SettingsService.Set("Density", DensityNormal.IsChecked == true ? 0 : (DensityMore.IsChecked == true ? 1 : 2));
         Services.SettingsService.Set("DisplayScreenMode", ScreenPrimary.IsChecked == true ? 0 : (ScreenAll.IsChecked == true ? 1 : (ScreenSpan.IsChecked == true ? 3 : 2)));
         Services.SettingsService.Set("FontFamilyName", GetSelectedFontFamilyName());
@@ -387,6 +391,7 @@ public sealed partial class MainWindow : Window
             SpeedSlider.Value = Services.SettingsService.Get<double>("Speed", 6);
             OpacitySlider.Value = Services.SettingsService.Get<double>("Opacity", 100);
             DisplayAreaSlider.Value = Services.SettingsService.Get<double>("DisplayArea", 100);
+            MaxNotificationLengthBox.Value = Services.SettingsService.Get<int>("MaxNotificationLength", 30);
             
             int den = Services.SettingsService.Get<int>("Density", 0);
             if (den == 0) DensityNormal.IsChecked = true;
@@ -457,6 +462,7 @@ public sealed partial class MainWindow : Window
         SpeedSlider.ValueChanged += (s,e) => SaveSettings();
         OpacitySlider.ValueChanged += (s,e) => SaveSettings();
         DisplayAreaSlider.ValueChanged += (s,e) => SaveSettings();
+        MaxNotificationLengthBox.ValueChanged += (s,e) => SaveSettings();
         DensityNormal.Checked += (s,e) => SaveSettings();
         DensityMore.Checked += (s,e) => SaveSettings();
         DensityOverlap.Checked += (s,e) => SaveSettings();
@@ -594,7 +600,13 @@ public sealed partial class MainWindow : Window
     {
         var settings = DanmakuStyleSettings.Load();
         string text = $"{LocalizationService.Instance.TestNotificationAppName}: {LocalizationService.Instance.TestNotificationTitle} {LocalizationService.Instance.TestNotificationMessagePrefix} - {DateTime.Now:HH:mm:ss}";
-        _renderer.ShowDanmaku(text, null, settings);
+        _renderer.ShowDanmaku(TruncateNotificationText(text), null, settings);
+    }
+
+    private static string TruncateNotificationText(string text)
+    {
+        int maxLength = Math.Max(1, SettingsService.Get<int>("MaxNotificationLength", 30));
+        return text.Length > maxLength ? text[..maxLength] + "..." : text;
     }
 
     private async void OnNewDanmaku(damuku_kano.Models.NotificationItem item)
@@ -618,6 +630,6 @@ public sealed partial class MainWindow : Window
         }
 
         var settings = DanmakuStyleSettings.Load();
-        _renderer.ShowDanmaku(text, iconPng, settings);
+        _renderer.ShowDanmaku(TruncateNotificationText(text), iconPng, settings);
     }
 }
